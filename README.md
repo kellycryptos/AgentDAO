@@ -1,68 +1,125 @@
-# AgentDAO 🤖🏛️
+<div align="center">
 
-**AgentDAO** is an AI-powered governance proposal drafting engine built for decentralized organizations. It transforms plain-language community ideas into structured, formal DAO governance proposals ready for review, voting, and execution.
+# AgentDAO
 
----
+**Run a DAO the way you'd run a group chat.**
 
-## 🚀 Live Demo
+An AI agent that helps everyday communities create proposals, discuss, vote, and manage a shared treasury — in plain language, no crypto expertise required.
 
-- **Live URL**: [https://agent-dao-gilt.vercel.app](https://agent-dao-gilt.vercel.app)
-- **GitHub Repository**: [https://github.com/kellycryptos/AgentDAO](https://github.com/kellycryptos/AgentDAO)
+[![Live Demo](https://img.shields.io/badge/demo-live-00E5C7?style=flat-square)](https://agent-dao-gilt.vercel.app/)
+[![Status](https://img.shields.io/badge/status-beta-7B4FF2?style=flat-square)]()
+[![Built for](https://img.shields.io/badge/built%20for-GIWA%20%2F%20GASOK-12102B?style=flat-square)](https://giwa.io/gasok)
+[![License](https://img.shields.io/badge/license-MIT-gray?style=flat-square)](#license)
 
----
+[Live Demo](https://agent-dao-gilt.vercel.app/) · [Report a Bug](../../issues) · [Request a Feature](../../issues)
 
-## ✨ Features
-
-- **Natural Language Proposal Generator**: Enter a simple request (e.g. *"draft a proposal to fund a community art grant for 2000 USDC"*), and AgentDAO's AI constructs a complete proposal.
-- **Structured Proposal Cards**: Displays formatted proposal components including Title, Requested Amount, Executive Summary, and Rationale/ROI.
-- **Anthropic LLM Integration**: Powered by Claude (`claude-3-5-sonnet`) when `ANTHROPIC_API_KEY` is configured.
-- **Dynamic Mock Fallback**: Zero-dependency mock proposal generator built-in so the demo works seamlessly out-of-the-box even without an API key.
-- **Modern Dark Violet UI**: Styled with a dark indigo palette (`#12102B`), violet accents (`#7B4FF2`), and mint highlights (`#00E5C7`).
+</div>
 
 ---
 
-## 🛠️ Local Development
+## Overview
+
+Running a DAO is still too hard for everyday groups. Wallets, gas, and governance dashboards assume a crypto-native user. Writing a clear, votable proposal takes time most people don't have. Long discussion threads bury the actual decision that needs a vote. Shared treasuries need clear rules that most small communities never set.
+
+**AgentDAO** puts an AI agent between your community and the chain. Members talk to it in plain language, and the agent turns that conversation into structured proposals, clear summaries, onchain votes, and (eventually) treasury actions.
+
+## Status
+
+> **This project is in beta.** The current build demonstrates the core AI proposal-generation flow end to end. Onchain voting and the Agent Treasury are in active development — see [Roadmap](#roadmap).
+
+## Features
+
+| | |
+|---|---|
+| 💬 **Natural language interface** | Create groups, ask questions, and take action through plain conversation |
+| ✍️ **AI proposal writer** | Turns a plain-language request into a structured, votable proposal |
+| 🧵 **Discussion summarizer** | Condenses long threads into a short, decision-ready summary |
+| 🗳️ **Simple onchain voting** *(in progress)* | One-tap voting on structured proposals |
+| 💰 **Agent Treasury** *(planned)* | AI-assisted fund management against member-set rules |
+
+## Live Demo
+
+**[agent-dao-gilt.vercel.app](https://agent-dao-gilt.vercel.app/)**
+
+Try a prompt like:
+```
+Draft a proposal to fund a community art grant for 2000 USDC
+```
+
+The agent will return a structured proposal card with a title, summary, requested amount, and rationale.
+
+## Tech Stack
+
+- **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS
+- **AI:** Anthropic API for proposal drafting and summarization
+- **Chain** *(planned)*: GIWA Sepolia testnet, Solidity, Hardhat
+- **Wallet** *(planned)*: Privy, Wagmi, Viem
+- **Hosting:** Vercel
+
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+ installed
-- npm or yarn
 
-### Setup
+- Node.js v18+
+- An [Anthropic API key](https://console.anthropic.com/) (optional — the app runs on a mock fallback without one)
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/kellycryptos/AgentDAO.git
-   cd AgentDAO
-   ```
+### Installation
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+```bash
+git clone https://github.com/kellycryptos/AgentDAO.git
+cd AgentDAO
+npm install
+```
 
-3. **Configure Environment Variables** (Optional):
-   Create a `.env.local` file based on `.env.example`:
-   ```bash
-   cp .env.example .env.local
-   ```
-   Set your `ANTHROPIC_API_KEY` if you wish to use live LLM calls:
-   ```env
-   ANTHROPIC_API_KEY=your_anthropic_api_key_here
-   ```
-   *Note: If left unset, AgentDAO automatically uses the built-in mock proposal generator.*
+### Environment Variables
 
-4. **Run Development Server**:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+Create a `.env.local` file in the project root:
+
+```env
+ANTHROPIC_API_KEY=your_api_key_here
+```
+
+> If this is unset, the app falls back to a mock response so the chat flow still works for local development and demos.
+
+### Run Locally
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Roadmap
+
+| Phase | Target | Scope |
+|---|---|---|
+| **Phase 1** | Now → Q3 2026 | Core AI chat + proposal creation + basic onchain voting on GIWA testnet |
+| **Phase 2** | Q4 2026 | Full voting system + Agent Treasury + private mainnet testing |
+| **Phase 3** | 2027 | Public mainnet launch on GIWA + advanced agent features |
+
+## Why GIWA
+
+AgentDAO is built for the [GIWA](https://docs.giwa.io/giwa-chain/en) ecosystem — a high-performance L2 well suited to a chat-driven, high-frequency governance tool, with the [GASOK](https://giwa.io/gasok) program offering infrastructure support and access to an established user base.
+
+## Team
+
+| Name | Role | Location |
+|---|---|---|
+| Kelvin Mba | Founder & Lead Developer | Abuja, Nigeria |
+| Godsreward Ginikanwa | Co-Founder | Casablanca-Settat, Morocco |
+| Okorie Kosisochukwu | Product Lead | Lagos, Nigeria |
+| Austine Ndukwe | Community Lead | Lagos, Nigeria |
+
+## Contributing
+
+This project is in early, active development. Issues and pull requests are welcome — please open an issue first to discuss any significant change.
+
+## License
+
+MIT — see [LICENSE](LICENSE) for details.
 
 ---
 
-## 📦 Deployment
-
-AgentDAO is built with standard Next.js (App Router) and requires zero custom configuration to deploy on Vercel:
-
-1. Import `kellycryptos/AgentDAO` into [Vercel](https://vercel.com).
-2. (Optional) Set `ANTHROPIC_API_KEY` in Environment Variables.
-3. Click **Deploy**.
+<div align="center">
+<sub>Built for the GIWA / GASOK Builder Program</sub>
+</div>
