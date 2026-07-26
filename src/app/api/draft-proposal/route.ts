@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import Anthropic from "@anthropic-ai/sdk";
+import Groq from "groq-sdk";
 
 export interface ProposalDraft {
   title: string;
@@ -18,15 +18,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Prompt is required" }, { status: 400 });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const apiKey = process.env.GROQ_API_KEY;
 
     if (apiKey && apiKey.trim() !== "") {
       try {
-        const anthropic = new Anthropic({ apiKey });
-        const response = await anthropic.messages.create({
-          model: "claude-3-5-sonnet-20241022",
-          max_tokens: 1024,
-          system: `You are AgentDAO's proposal generation assistant. Analyze the user's request and draft a structured DAO proposal.
+        const groq = new Groq({ apiKey });
+        const chatCompletion = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          temperature: 0.3,
+          max_completion_tokens: 1024,
+          messages: [
+            {
+              role: "system",
+              content: `You are AgentDAO's proposal generation assistant. Analyze the user's request and draft a structured DAO proposal.
 Return ONLY valid JSON without any markdown formatting or commentary. The JSON object must strictly match this TypeScript interface:
 {
   "title": "Clear, concise title for the proposal",
@@ -34,7 +38,7 @@ Return ONLY valid JSON without any markdown formatting or commentary. The JSON o
   "amount": "The exact requested amount with token denomination (e.g. '2,000 USDC')",
   "rationale": "Logical explanation of benefits, milestones, and ROI for the DAO"
 }`,
-          messages: [
+            },
             {
               role: "user",
               content: prompt,
@@ -42,8 +46,8 @@ Return ONLY valid JSON without any markdown formatting or commentary. The JSON o
           ],
         });
 
-        const textResponse = response.content[0]?.type === "text" ? response.content[0].text : "";
-        
+        const textResponse = chatCompletion.choices[0]?.message?.content || "";
+
         // Clean JSON string in case model wraps with ```json ... ```
         const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
@@ -51,11 +55,11 @@ Return ONLY valid JSON without any markdown formatting or commentary. The JSON o
           return NextResponse.json({ ...parsed, isMock: false });
         }
       } catch (err) {
-        console.error("Anthropic API error, falling back to mock:", err);
+        console.error("Groq API error, falling back to mock:", err);
       }
     }
 
-    // Stub mock response when ANTHROPIC_API_KEY is unset or fails
+    // Stub mock response when GROQ_API_KEY is unset or fails
     const mockDraft = generateMockProposal(prompt);
     return NextResponse.json(mockDraft);
   } catch (error) {
@@ -69,7 +73,7 @@ Return ONLY valid JSON without any markdown formatting or commentary. The JSON o
 
 function generateMockProposal(prompt: string): ProposalDraft {
   const lower = prompt.toLowerCase();
-  
+
   // Extract amount if present in prompt
   const amountMatch = prompt.match(/(\$?[\d,]+(?:\.\d+)?\s*(?:USDC|ETH|GIWA|DAI|tokens)?)/i);
   let detectedAmount = amountMatch ? amountMatch[1].toUpperCase() : "2,000 USDC";
