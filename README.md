@@ -6,7 +6,7 @@
 
 ## 🚀 Live Demo
 
-- **Live URL**: [https://agentdao.vercel.app](https://agentdao.vercel.app) *(Deploying to Vercel)*
+- **Live URL**: [https://agent-dao-gilt.vercel.app](https://agent-dao-gilt.vercel.app)
 - **GitHub Repository**: [https://github.com/kellycryptos/AgentDAO](https://github.com/kellycryptos/AgentDAO)
 
 ---
