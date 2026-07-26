@@ -51,7 +51,7 @@ The agent will return a structured proposal card with a title, summary, requeste
 ## Tech Stack
 
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS
-- **AI:** Anthropic API for proposal drafting and summarization
+- **AI:** Groq API (`llama-3.3-70b-versatile`) for proposal drafting and summarization
 - **Chain** *(planned)*: GIWA Sepolia testnet, Solidity, Hardhat
 - **Wallet** *(planned)*: Privy, Wagmi, Viem
 - **Hosting:** Vercel
@@ -61,7 +61,7 @@ The agent will return a structured proposal card with a title, summary, requeste
 ### Prerequisites
 
 - Node.js v18+
-- An [Anthropic API key](https://console.anthropic.com/) (optional — the app runs on a mock fallback without one)
+- A [Groq API key](https://console.groq.com/) (optional — the app runs on a mock fallback without one)
 
 ### Installation
 
@@ -76,7 +76,7 @@ npm install
 Create a `.env.local` file in the project root:
 
 ```env
-ANTHROPIC_API_KEY=your_api_key_here
+GROQ_API_KEY=your_api_key_here
 ```
 
 > If this is unset, the app falls back to a mock response so the chat flow still works for local development and demos.
