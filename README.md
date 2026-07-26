@@ -51,7 +51,7 @@ The agent will return a structured proposal card with a title, summary, requeste
 ## Tech Stack
 
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS
-- **AI:** Groq API (`llama-3.3-70b-versatile`) for proposal drafting and summarization
+- **AI:** Groq AI for fast proposal drafting and summarization
 - **Chain** *(planned)*: GIWA Sepolia testnet, Solidity, Hardhat
 - **Wallet** *(planned)*: Privy, Wagmi, Viem
 - **Hosting:** Vercel
