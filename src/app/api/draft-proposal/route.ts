@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
             {
               role: "system",
               content: `You are AgentDAO's proposal generation assistant. Analyze the user's request and draft a structured DAO proposal.
-Return ONLY valid JSON without any markdown formatting or commentary. The JSON object must strictly match this TypeScript interface:
+Return ONLY valid JSON without any markdown formatting, commentary, or thinking tags. The JSON object must strictly match this TypeScript interface:
 {
   "title": "Clear, concise title for the proposal",
   "summary": "2-3 sentence overview of what is being requested and why",
@@ -46,13 +46,28 @@ Return ONLY valid JSON without any markdown formatting or commentary. The JSON o
           ],
         });
 
-        const textResponse = chatCompletion.choices[0]?.message?.content || "";
+        let textResponse = chatCompletion.choices[0]?.message?.content || "";
 
-        // Clean JSON string in case model wraps with ```json ... ```
-        const jsonMatch = textResponse.match(/\{[\s\S]*\}/);
-        if (jsonMatch) {
-          const parsed = JSON.parse(jsonMatch[0]) as ProposalDraft;
-          return NextResponse.json({ ...parsed, isMock: false });
+        // Strip thinking blocks if model outputs them (e.g. <think>...</think> or unclosed <think>...)
+        if (textResponse.includes("</think>")) {
+          textResponse = textResponse.split("</think>").pop() || "";
+        } else {
+          textResponse = textResponse.replace(/<think>[\s\S]*?$/gi, "");
+        }
+
+        textResponse = textResponse.trim();
+
+        // Extract JSON block cleanly
+        const firstOpen = textResponse.indexOf("{");
+        const lastClose = textResponse.lastIndexOf("}");
+        if (firstOpen !== -1 && lastClose > firstOpen) {
+          const jsonStr = textResponse.slice(firstOpen, lastClose + 1);
+          try {
+            const parsed = JSON.parse(jsonStr) as ProposalDraft;
+            return NextResponse.json({ ...parsed, isMock: false });
+          } catch (e) {
+            console.warn("Direct JSON parse failed:", e);
+          }
         }
       } catch (err) {
         console.error("Groq API error, falling back to mock:", err);
