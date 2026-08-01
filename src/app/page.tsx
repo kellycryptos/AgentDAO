@@ -14,6 +14,8 @@ import {
   ShieldCheck,
   RefreshCw,
 } from "lucide-react";
+import { ConnectButton } from "@/components/ConnectButton";
+
 
 interface ProposalData {
   title: string;
@@ -160,10 +162,13 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 text-xs font-mono bg-[#1B173E] px-3 py-1.5 rounded-lg border border-[#2E265C]">
-            <ShieldCheck className="w-4 h-4 text-[#00E5C7]" />
-            <span className="text-[#9E9BB9]">Mode:</span>
-            <span className="text-[#00E5C7]">Proposal Generator</span>
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex items-center gap-2 text-xs font-mono bg-[#1B173E] px-3 py-1.5 rounded-lg border border-[#2E265C]">
+              <ShieldCheck className="w-4 h-4 text-[#00E5C7]" />
+              <span className="text-[#9E9BB9]">Mode:</span>
+              <span className="text-[#00E5C7]">Proposal Generator</span>
+            </div>
+            <ConnectButton />
           </div>
         </div>
       </header>
