@@ -22,10 +22,29 @@ import {
   Clock,
   Vote,
   Sparkles,
+  RefreshCw,
 } from "lucide-react";
 
 interface ProposalItemProps {
   id: bigint;
+}
+
+function parseFriendlyError(error: any): string {
+  if (!error) return "An unexpected transaction error occurred.";
+  const msg = error?.shortMessage || error?.message || String(error);
+  if (msg.includes("User rejected") || msg.includes("user rejected")) {
+    return "Transaction request was cancelled in your wallet.";
+  }
+  if (msg.includes("insufficient funds")) {
+    return "Insufficient testnet ETH for gas fees on GIWA Sepolia.";
+  }
+  if (msg.includes("AlreadyVoted")) {
+    return "You have already voted on this proposal.";
+  }
+  if (msg.includes("ProposalDoesNotExist")) {
+    return "This proposal ID does not exist onchain.";
+  }
+  return msg;
 }
 
 function ProposalItem({ id }: ProposalItemProps) {
@@ -70,15 +89,19 @@ function ProposalItem({ id }: ProposalItemProps) {
       });
       refetch();
     } catch (err: any) {
-      setLocalError(err?.shortMessage || err?.message || "Voting transaction failed");
+      setLocalError(parseFriendlyError(err));
     }
   };
 
   if (!proposal) {
     return (
-      <div className="bg-[#1B173E] border border-[#2E265C] rounded-2xl p-5 animate-pulse flex items-center gap-3">
-        <Loader2 className="w-5 h-5 text-[#7B4FF2] animate-spin" />
-        <span className="text-sm text-[#9E9BB9]">Loading proposal #{id.toString()} from GIWA Sepolia...</span>
+      <div className="bg-[#1B173E] border border-[#2E265C] rounded-2xl p-6 space-y-3 animate-pulse">
+        <div className="flex items-center justify-between">
+          <div className="h-4 bg-[#2E265C] rounded w-1/4" />
+          <div className="h-6 bg-[#2E265C] rounded w-20" />
+        </div>
+        <div className="h-5 bg-[#2E265C] rounded w-3/4" />
+        <div className="h-16 bg-[#12102B]/60 rounded-xl" />
       </div>
     );
   }
@@ -94,26 +117,28 @@ function ProposalItem({ id }: ProposalItemProps) {
   });
 
   return (
-    <div className="bg-[#1B173E] border border-[#2E265C] hover:border-[#7B4FF2]/40 transition-all rounded-2xl p-6 shadow-xl space-y-4">
+    <div className="bg-[#1B173E] border border-[#2E265C] hover:border-[#7B4FF2]/50 transition-all rounded-2xl p-5 sm:p-6 shadow-xl space-y-4 relative overflow-hidden group">
+      <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#7B4FF2] to-[#00E5C7] opacity-0 group-hover:opacity-100 transition-opacity" />
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#2E265C]">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[#7B4FF2]/20 text-[#00E5C7] border border-[#7B4FF2]/40">
               Proposal #{id.toString()}
             </span>
             <span className="text-xs text-[#9E9BB9] font-mono flex items-center gap-1">
-              <Clock className="w-3 h-3 text-[#9E9BB9]/60" /> {formattedDate}
+              <Clock className="w-3.5 h-3.5 text-[#9E9BB9]/60" /> {formattedDate}
             </span>
           </div>
-          <h3 className="font-bold text-lg text-white">{title}</h3>
+          <h3 className="font-bold text-base sm:text-lg text-white group-hover:text-[#00E5C7] transition-colors">{title}</h3>
         </div>
 
-        <div className="bg-[#12102B] px-3.5 py-2 rounded-xl border border-[#2E265C] flex items-center gap-2 self-start sm:self-auto shrink-0">
+        <div className="bg-[#12102B] px-3.5 py-2 rounded-xl border border-[#2E265C] flex items-center gap-2 self-start sm:self-auto shrink-0 shadow-inner">
           <DollarSign className="w-4 h-4 text-[#00E5C7]" />
           <div>
             <div className="text-[10px] uppercase text-[#9E9BB9] font-mono">Amount</div>
-            <div className="text-xs font-bold font-mono text-[#00E5C7]">{formattedAmount} ETH / USDC</div>
+            <div className="text-xs sm:text-sm font-bold font-mono text-[#00E5C7]">{formattedAmount} ETH</div>
           </div>
         </div>
       </div>
@@ -124,7 +149,7 @@ function ProposalItem({ id }: ProposalItemProps) {
       </p>
 
       {/* Proposer details */}
-      <div className="flex items-center justify-between text-xs text-[#9E9BB9] pt-1">
+      <div className="flex items-center justify-between text-xs text-[#9E9BB9] pt-1 flex-wrap gap-2">
         <div className="flex items-center gap-1.5 font-mono">
           <User className="w-3.5 h-3.5 text-[#7B4FF2]" />
           <span>Proposer:</span>
@@ -144,22 +169,22 @@ function ProposalItem({ id }: ProposalItemProps) {
       <div className="pt-2 border-t border-[#2E265C] space-y-3">
         <div className="grid grid-cols-2 gap-3 text-center">
           <div className="bg-emerald-950/30 border border-emerald-500/30 p-2.5 rounded-xl">
-            <div className="text-xs font-mono uppercase text-emerald-400">Yes Votes</div>
+            <div className="text-[11px] font-mono uppercase text-emerald-400">Yes Votes</div>
             <div className="text-lg font-extrabold text-emerald-300 font-mono">{yesVotes.toString()}</div>
           </div>
           <div className="bg-rose-950/30 border border-rose-500/30 p-2.5 rounded-xl">
-            <div className="text-xs font-mono uppercase text-rose-400">No Votes</div>
+            <div className="text-[11px] font-mono uppercase text-rose-400">No Votes</div>
             <div className="text-lg font-extrabold text-rose-300 font-mono">{noVotes.toString()}</div>
           </div>
         </div>
 
         {/* Voting Action */}
         {!isConnected ? (
-          <div className="text-xs text-[#9E9BB9] text-center italic py-1">
+          <div className="text-xs text-[#9E9BB9] text-center italic py-2 bg-[#12102B]/40 rounded-xl border border-[#2E265C]/60">
             Connect wallet on GIWA Sepolia to cast your vote.
           </div>
         ) : !isCorrectNetwork ? (
-          <div className="text-xs text-amber-300 text-center py-1">
+          <div className="text-xs text-amber-300 text-center py-2 bg-amber-950/20 rounded-xl border border-amber-500/30">
             Switch network to GIWA Sepolia to vote.
           </div>
         ) : hasVotedUser ? (
@@ -173,7 +198,7 @@ function ProposalItem({ id }: ProposalItemProps) {
               type="button"
               onClick={() => handleVote(true)}
               disabled={isWritePending || isConfirming}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md disabled:opacity-50 cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {isWritePending && voteType === true ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -187,7 +212,7 @@ function ProposalItem({ id }: ProposalItemProps) {
               type="button"
               onClick={() => handleVote(false)}
               disabled={isWritePending || isConfirming}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md disabled:opacity-50 cursor-pointer"
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               {isWritePending && voteType === false ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -202,22 +227,22 @@ function ProposalItem({ id }: ProposalItemProps) {
         {(writeError || localError) && (
           <div className="text-xs text-red-300 bg-red-950/40 p-2.5 rounded-xl border border-red-500/30 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-            <span>{localError || writeError?.message}</span>
+            <span>{localError || parseFriendlyError(writeError)}</span>
           </div>
         )}
 
         {isConfirmed && hash && (
-          <div className="text-xs text-[#00E5C7] bg-[#00E5C7]/10 p-2.5 rounded-xl flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
+          <div className="text-xs text-[#00E5C7] bg-[#00E5C7]/10 p-2.5 rounded-xl flex items-center justify-between flex-wrap gap-2">
+            <span className="flex items-center gap-1.5 font-medium">
               <CheckCircle2 className="w-4 h-4" /> Vote Recorded Onchain!
             </span>
             <a
               href={`https://sepolia-explorer.giwa.io/tx/${hash}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="font-mono underline text-[11px]"
+              className="font-mono underline text-[11px] hover:text-white"
             >
-              Tx Explorer
+              View Tx Explorer
             </a>
           </div>
         )}
@@ -227,11 +252,11 @@ function ProposalItem({ id }: ProposalItemProps) {
 }
 
 export function ProposalList() {
-  const { data: count, isLoading, refetch } = useReadContract({
+  const { data: count, isLoading, isError, refetch } = useReadContract({
     address: PROPOSAL_REGISTRY_ADDRESS,
     abi: PROPOSAL_REGISTRY_ABI,
     functionName: "proposalCount",
-    query: { refetchInterval: 3000 },
+    query: { refetchInterval: 4000 },
   });
 
   const proposalCountNum = count ? Number(count) : 0;
@@ -239,34 +264,65 @@ export function ProposalList() {
 
   return (
     <section id="proposals-list" className="border-t border-[#2E265C] pt-12 pb-16">
-      <div className="max-w-5xl mx-auto px-6">
-        <div className="flex items-center justify-between mb-8">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <Vote className="w-5 h-5 text-[#00E5C7]" />
-              <h2 className="text-2xl font-bold text-white">GIWA Sepolia Onchain Proposals</h2>
+              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">GIWA Sepolia Onchain Proposals</h2>
             </div>
             <p className="text-xs text-[#9E9BB9]">
-              Live proposals registered on `ProposalRegistry` ({PROPOSAL_REGISTRY_ADDRESS.slice(0, 8)}...{PROPOSAL_REGISTRY_ADDRESS.slice(-6)})
+              Registered proposals on `ProposalRegistry` contract ({PROPOSAL_REGISTRY_ADDRESS.slice(0, 8)}...{PROPOSAL_REGISTRY_ADDRESS.slice(-6)})
             </p>
           </div>
 
-          <div className="bg-[#1B173E] px-3.5 py-1.5 rounded-xl border border-[#2E265C] text-xs font-mono text-[#00E5C7] flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Total: {proposalCountNum}</span>
+          <div className="flex items-center gap-3 self-start sm:self-auto">
+            <button
+              onClick={() => refetch()}
+              className="p-2 rounded-xl bg-[#1B173E] hover:bg-[#252054] text-[#9E9BB9] hover:text-white border border-[#2E265C] transition-all cursor-pointer"
+              title="Refresh proposal list"
+            >
+              <RefreshCw className="w-4 h-4" />
+            </button>
+            <div className="bg-[#1B173E] px-3.5 py-1.5 rounded-xl border border-[#2E265C] text-xs font-mono text-[#00E5C7] flex items-center gap-2">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Total: {proposalCountNum}</span>
+            </div>
           </div>
         </div>
 
         {isLoading ? (
-          <div className="bg-[#1B173E] border border-[#2E265C] rounded-2xl p-8 text-center space-y-3">
-            <Loader2 className="w-6 h-6 text-[#7B4FF2] animate-spin mx-auto" />
-            <p className="text-sm text-[#9E9BB9]">Reading proposal registry from GIWA Sepolia...</p>
+          <div className="space-y-4">
+            {[1, 2].map((n) => (
+              <div key={n} className="bg-[#1B173E] border border-[#2E265C] rounded-2xl p-6 space-y-3 animate-pulse">
+                <div className="flex items-center justify-between">
+                  <div className="h-4 bg-[#2E265C] rounded w-1/4" />
+                  <div className="h-6 bg-[#2E265C] rounded w-20" />
+                </div>
+                <div className="h-5 bg-[#2E265C] rounded w-3/4" />
+                <div className="h-16 bg-[#12102B]/60 rounded-xl" />
+              </div>
+            ))}
+          </div>
+        ) : isError ? (
+          <div className="bg-red-950/30 border border-red-500/30 rounded-2xl p-8 text-center space-y-3">
+            <AlertCircle className="w-8 h-8 text-red-400 mx-auto" />
+            <h3 className="font-semibold text-white">Unable to Load Proposals</h3>
+            <p className="text-xs text-red-200/80 max-w-md mx-auto">
+              Failed to connect to GIWA Sepolia RPC. Please check your network connection or try refreshing.
+            </p>
+            <button
+              onClick={() => refetch()}
+              className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-xl bg-red-900/40 border border-red-500/40 text-white hover:bg-red-900/60 transition-all cursor-pointer"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Retry Fetching
+            </button>
           </div>
         ) : proposalCountNum === 0 ? (
           <div className="bg-[#1B173E] border border-[#2E265C] rounded-2xl p-8 text-center space-y-3">
             <Vote className="w-8 h-8 text-[#9E9BB9]/40 mx-auto" />
             <h3 className="font-semibold text-white">No Onchain Proposals Yet</h3>
-            <p className="text-xs text-[#9E9BB9] max-w-md mx-auto">
+            <p className="text-xs text-[#9E9BB9] max-w-md mx-auto leading-relaxed">
               Draft a governance proposal with the AI assistant above and click <strong>"Submit Onchain"</strong> to create the first live proposal!
             </p>
           </div>
