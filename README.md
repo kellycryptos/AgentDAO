@@ -25,7 +25,14 @@ Running a DAO is still too hard for everyday groups. Wallets, gas, and governanc
 
 ## Status
 
-> **This project is in beta.** The current build demonstrates the core AI proposal-generation flow end to end. Onchain voting and the Agent Treasury are in active development — see [Roadmap](#roadmap).
+> **Live MVP on GIWA Sepolia.** The app features an end-to-end AI proposal generator, Reown AppKit wallet connection, and live onchain proposal registration & voting on GIWA Sepolia testnet.
+
+## Deployed Smart Contract
+
+- **Network:** GIWA Sepolia (Chain ID: `91342`)
+- **Contract Name:** `ProposalRegistry`
+- **Verified Contract Address:** [`0xcCe989122524D99D05C9EE871505c11bE935deCb`](https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb)
+- **Explorer:** [GIWA Sepolia Blockscout Explorer](https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb)
 
 ## Features
 
@@ -33,8 +40,8 @@ Running a DAO is still too hard for everyday groups. Wallets, gas, and governanc
 |---|---|
 | 💬 **Natural language interface** | Create groups, ask questions, and take action through plain conversation |
 | ✍️ **AI proposal writer** | Turns a plain-language request into a structured, votable proposal |
-| 🧵 **Discussion summarizer** | Condenses long threads into a short, decision-ready summary |
-| 🗳️ **Simple onchain voting** *(in progress)* | One-tap voting on structured proposals |
+| 🔗 **Reown AppKit Wallet Connection** | Seamless web3 wallet connection supporting GIWA Sepolia custom chain |
+| 🗳️ **GIWA Sepolia Onchain Voting** | Submit AI proposal drafts directly onchain and cast Yes/No votes |
 | 💰 **Agent Treasury** *(planned)* | AI-assisted fund management against member-set rules |
 
 ## Live Demo
@@ -46,14 +53,14 @@ Try a prompt like:
 Draft a proposal to fund a community art grant for 2000 USDC
 ```
 
-The agent will return a structured proposal card with a title, summary, requested amount, and rationale.
+The agent will return a structured proposal card with an **"Submit Onchain"** button to register it on GIWA Sepolia.
 
 ## Tech Stack
 
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS
-- **AI:** Groq AI for fast proposal drafting and summarization
-- **Chain** *(planned)*: GIWA Sepolia testnet, Solidity, Hardhat
-- **Wallet** *(planned)*: Privy, Wagmi, Viem
+- **AI:** Groq AI (Llama 3.3 70B) for fast proposal drafting
+- **Chain:** GIWA Sepolia testnet (Chain ID: `91342`), Solidity, Hardhat
+- **Wallet & Web3:** Reown AppKit, Wagmi, Viem
 - **Hosting:** Vercel
 
 ## Getting Started

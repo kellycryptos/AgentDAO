@@ -15,6 +15,8 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { ConnectButton } from "@/components/ConnectButton";
+import { SubmitOnchainButton } from "@/components/SubmitOnchainButton";
+import { ProposalList } from "@/components/ProposalList";
 
 
 interface ProposalData {
@@ -289,7 +291,7 @@ export default function Home() {
                 {[
                   "AI proposal generator",
                   "Clean, structured output",
-                  "Ready for community discussion",
+                  "GIWA Sepolia onchain voting",
                 ].map((f) => (
                   <li
                     key={f}
@@ -311,7 +313,7 @@ export default function Home() {
                 </h4>
               </div>
               <ul className="space-y-3">
-                {["Onchain voting", "Agent Treasury", "Group management"].map(
+                {["Agent Treasury", "Group management", "Automated AI delegates"].map(
                   (f) => (
                     <li
                       key={f}
@@ -471,6 +473,13 @@ export default function Home() {
                           {msg.proposal.rationale}
                         </p>
                       </div>
+
+                      {/* Onchain Submission Layer */}
+                      <SubmitOnchainButton
+                        title={msg.proposal.title}
+                        summary={msg.proposal.summary}
+                        amount={msg.proposal.amount}
+                      />
                     </div>
                   </div>
                 )}
@@ -535,6 +544,9 @@ export default function Home() {
           </div>
         </form>
       </main>
+
+      {/* ── ONCHAIN PROPOSALS LIST ── */}
+      <ProposalList />
     </div>
   );
 }
