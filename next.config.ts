@@ -11,7 +11,10 @@ const nextConfig: NextConfig = {
         (resource: any) => {
           resource.request = "data:text/javascript,export default {}";
         }
-      )
+      ),
+      new webpack.IgnorePlugin({
+        resourceRegExp: /^accounts$/,
+      })
     );
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -20,12 +23,14 @@ const nextConfig: NextConfig = {
       tls: false,
       crypto: false,
       "@coinbase/cdp-sdk": false,
+      accounts: false,
     };
     return config;
   },
 };
 
 export default nextConfig;
+
 
 
 
