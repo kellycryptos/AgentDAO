@@ -83,7 +83,7 @@ function ProposalItem({ id }: ProposalItemProps) {
     );
   }
 
-  const [title, summary, amount, proposer, yesVotes, noVotes, createdAt] = proposal;
+  const { title, summary, amount, proposer, yesVotes, noVotes, createdAt } = proposal;
   const formattedAmount = formatEther(amount);
   const formattedDate = new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
     month: "short",
