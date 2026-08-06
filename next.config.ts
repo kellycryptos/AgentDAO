@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
-import webpack from "webpack";
 
 const nextConfig: NextConfig = {
   turbopack: {},
-  webpack: (config) => {
+  webpack: (config, { webpack }) => {
     config.externals.push("pino-pretty", "lokijs", "encoding", "@coinbase/cdp-sdk");
     config.plugins.push(
       new webpack.NormalModuleReplacementPlugin(
@@ -30,6 +29,7 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+
 
 
 
