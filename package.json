@@ -19,13 +19,11 @@
     "next": "16.2.12",
     "react": "19.2.4",
     "react-dom": "19.2.4",
-    "viem": "^2.21.55",
+    "viem": "^2.55.11",
     "wagmi": "^3.7.5"
   },
   "devDependencies": {
-    "@nomicfoundation/hardhat-ignition-viem": "^3.1.6",
     "@nomicfoundation/hardhat-toolbox-viem": "^3.0.0",
-    "@nomicfoundation/hardhat-verify": "^2.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
