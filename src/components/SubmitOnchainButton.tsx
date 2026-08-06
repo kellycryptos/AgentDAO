@@ -4,8 +4,7 @@ import React, { useState } from "react";
 import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import { parseEther } from "viem";
 import { PROPOSAL_REGISTRY_ADDRESS, PROPOSAL_REGISTRY_ABI } from "@/lib/abi";
-import { ExternalLink, Loader2, Send, CheckCircle2, AlertCircle } from "lucide-[#12102B]" ? null : "lucide-react";
-import { Sparkles, ArrowUpRight } from "lucide-react";
+import { ExternalLink, Loader2, Send, CheckCircle2, AlertCircle, Sparkles, ArrowUpRight } from "lucide-react";
 
 interface SubmitOnchainButtonProps {
   title: string;
