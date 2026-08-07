@@ -23,6 +23,7 @@ import { SubmitOnchainButton } from "@/components/SubmitOnchainButton";
 import { ProposalList } from "@/components/ProposalList";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Footer } from "@/components/Footer";
+import { RatificationStrip } from "@/components/RatificationStrip";
 
 interface ProposalData {
   title: string;
@@ -181,40 +182,37 @@ export default function Home() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden border-b border-[var(--border-color)] bg-[var(--bg-hero)] transition-colors">
-        {/* Asymmetric ambient glow orbs */}
-        <div className="absolute -top-40 -left-40 w-[550px] h-[550px] bg-[#7B4FF2]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute top-10 right-0 w-[650px] h-[650px] bg-[#7B4FF2]/20 dark:bg-[#7B4FF2]/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-20 right-20 w-[450px] h-[450px] bg-[#00E5C7]/15 dark:bg-[#00E5C7]/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 py-12 lg:py-24">
+      <section className="relative overflow-hidden border-b border-[var(--border-color)] bg-[var(--bg-hero)] transition-colors py-12 lg:py-20">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             {/* LEFT COLUMN (55% width) */}
             <div className="lg:col-span-7 text-left space-y-6">
-              {/* Eyebrow badge */}
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--accent-violet-bg)] border border-[var(--accent-violet-border)] text-[var(--accent-violet)] text-xs font-mono tracking-wider uppercase font-bold shadow-sm">
+              {/* Eyebrow badge with thin 1px border */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full border border-[var(--accent-violet-border)] text-[var(--accent-violet)] text-xs font-receipt-mono tracking-wider uppercase font-semibold bg-[var(--accent-violet-bg)]">
                 <Sparkles className="w-3.5 h-3.5 text-[var(--accent-violet)]" />
                 AI-Powered Governance on GIWA Sepolia
               </div>
 
-              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-[var(--text-primary)] leading-[1.1]">
+              {/* Headline - Solid color, bold serif, monospace wink for group chat */}
+              <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[var(--text-primary)] font-serif-headline leading-[1.12]">
                 Run a DAO <br className="hidden sm:inline" />
                 the way you'd <br className="hidden sm:inline" />
-                <span className="bg-gradient-to-r from-[#7B4FF2] via-[#6366F1] to-[#00E5C7] bg-clip-text text-transparent">
-                  run a group chat
+                run a{" "}
+                <span className="font-receipt-mono text-[var(--accent-violet)] font-bold">
+                  group chat
                 </span>
               </h2>
 
-              <p className="text-base sm:text-lg text-[var(--text-secondary)] font-medium max-w-xl leading-relaxed">
+              <p className="text-base sm:text-lg text-[var(--text-secondary)] font-sans max-w-xl leading-relaxed">
                 Describe your governance idea or funding request in plain language. AgentDAO structures it into a clear, validated proposal in seconds — ready for live onchain voting on GIWA Sepolia.
               </p>
 
               {/* Action buttons */}
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                 <button
                   id="hero-cta"
                   onClick={scrollToChat}
-                  className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-[#7B4FF2] to-[#6366F1] hover:from-[#6366F1] hover:to-[#7B4FF2] text-white font-bold px-7 py-3.5 rounded-2xl transition-all shadow-xl shadow-[#7B4FF2]/25 hover:shadow-[#7B4FF2]/40 hover:scale-105 active:scale-100 text-sm cursor-pointer"
+                  className="inline-flex items-center justify-center gap-2 bg-[#7B4FF2] hover:bg-[#683CD4] text-white font-bold px-7 py-3.5 rounded-xl transition-all shadow-md text-sm cursor-pointer"
                 >
                   Start generating
                   <ArrowRight className="w-4 h-4" />
@@ -224,78 +222,17 @@ export default function Home() {
                   href={`https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center gap-2 bg-[var(--bg-card)] hover:bg-[var(--bg-card-subtle)] text-[var(--text-primary)] font-semibold px-6 py-3.5 rounded-2xl border border-[var(--border-color)] hover:border-[var(--accent-violet)] transition-all shadow-sm text-sm"
+                  className="inline-flex items-center justify-center gap-1.5 text-[var(--text-primary)] hover:text-[var(--accent-violet)] font-semibold text-sm transition-colors py-2 group"
                 >
-                  <span>View on GIWA Sepolia</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-[var(--accent-violet)]" />
+                  <span>View contract on GIWA Sepolia</span>
+                  <ArrowRight className="w-4 h-4 text-[var(--accent-violet)] transform group-hover:translate-x-1 transition-transform" />
                 </a>
               </div>
             </div>
 
-            {/* RIGHT COLUMN (45% width) — Layered Floating Mockup Stack */}
-            <div className="lg:col-span-5 relative w-full max-w-md mx-auto lg:max-w-none pt-4 lg:pt-0">
-              <div className="relative animate-float">
-                {/* Background Offset Card 2 */}
-                <div className="absolute -top-6 -right-4 w-full h-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-5 opacity-30 rotate-6 scale-90 blur-[0.5px] pointer-events-none shadow-sm hidden sm:block" />
-
-                {/* Background Offset Card 1 */}
-                <div className="absolute -top-3 -right-2 w-full h-full bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-5 opacity-60 rotate-3 scale-95 pointer-events-none shadow-md hidden sm:block" />
-
-                {/* Foreground Live Mock Card */}
-                <div className="relative bg-[var(--bg-card)] border border-[var(--border-card)] rounded-2xl p-5 sm:p-6 shadow-[var(--card-hover-shadow)] space-y-4 -rotate-1 transition-transform hover:rotate-0 duration-300">
-                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#7B4FF2] via-[#00E5C7] to-[#7B4FF2] rounded-t-2xl" />
-
-                  {/* Header */}
-                  <div className="flex items-center justify-between gap-2 pb-3 border-b border-[var(--border-color)]">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-mono uppercase px-2 py-0.5 rounded-full bg-[var(--accent-violet-bg)] text-[var(--accent-violet)] border border-[var(--accent-violet-border)] font-bold">
-                          Proposal #0
-                        </span>
-                        <span className="text-[10px] font-mono text-[var(--accent-mint)] flex items-center gap-1 font-semibold">
-                          <CheckCircle2 className="w-3 h-3" /> Live Onchain
-                        </span>
-                      </div>
-                      <h4 className="font-bold text-base text-[var(--text-primary)]">
-                        Community Art Grant
-                      </h4>
-                    </div>
-
-                    <div className="bg-[var(--bg-card-subtle)] px-3 py-1.5 rounded-xl border border-[var(--border-color)] text-right">
-                      <div className="text-[9px] uppercase text-[var(--text-muted)] font-mono">Amount</div>
-                      <div className="text-xs font-bold font-mono text-[var(--accent-mint)]">2,000 USDC</div>
-                    </div>
-                  </div>
-
-                  {/* Body description */}
-                  <p className="text-xs text-[var(--text-secondary)] leading-relaxed bg-[var(--bg-card-subtle)] p-3 rounded-xl border border-[var(--border-color)]">
-                    Fund local digital art workshops and community mural grants for GIWA ecosystem creators.
-                  </p>
-
-                  {/* Voting Progress Bar */}
-                  <div className="space-y-2 pt-1">
-                    <div className="flex items-center justify-between text-xs font-mono">
-                      <span className="text-[var(--accent-mint)] font-bold flex items-center gap-1">
-                        👍 Yes: 12 (85%)
-                      </span>
-                      <span className="text-rose-500 font-bold flex items-center gap-1">
-                        👎 No: 2 (15%)
-                      </span>
-                    </div>
-
-                    <div className="w-full h-2.5 bg-[var(--bg-card-subtle)] rounded-full overflow-hidden flex border border-[var(--border-color)]">
-                      <div className="h-full bg-gradient-to-r from-[#00E5C7] to-[#0D9488]" style={{ width: "85%" }} />
-                      <div className="h-full bg-rose-500" style={{ width: "15%" }} />
-                    </div>
-                  </div>
-
-                  {/* Footer Meta */}
-                  <div className="flex items-center justify-between pt-1 text-[10px] font-mono text-[var(--text-muted)]">
-                    <span>Proposer: 0x937d...f12b</span>
-                    <span className="text-[var(--accent-violet)] font-semibold">GIWA Sepolia #91342</span>
-                  </div>
-                </div>
-              </div>
+            {/* RIGHT COLUMN (45% width) — Signature Ratification Strip */}
+            <div className="lg:col-span-5 w-full pt-4 lg:pt-0">
+              <RatificationStrip />
             </div>
           </div>
         </div>
@@ -303,26 +240,26 @@ export default function Home() {
 
       {/* QUICK STATS STRIP */}
       <div className="border-b border-[var(--border-color)] bg-[var(--bg-card-subtle)] py-3.5 transition-colors">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-around gap-4 text-xs font-mono text-[var(--text-secondary)]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-around gap-4 text-xs font-receipt-mono text-[var(--text-secondary)]">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[var(--accent-mint)] animate-pulse" />
-            <span className="font-bold text-[var(--text-primary)]">2 Proposals Live</span>
-            <span className="text-[var(--text-muted)]">on ProposalRegistry</span>
+            <span className="font-bold text-[var(--text-primary)] font-receipt-mono">2 Proposals Live</span>
+            <span className="text-[var(--text-muted)] font-receipt-mono">on ProposalRegistry</span>
           </div>
 
           <div className="hidden sm:block text-[var(--border-color)]">|</div>
 
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-[var(--accent-violet)]" />
-            <span className="font-bold text-[var(--text-primary)]">GIWA Sepolia</span>
-            <span className="text-[var(--text-muted)]">Chain ID: 91342</span>
+            <span className="font-bold text-[var(--text-primary)] font-receipt-mono">GIWA Sepolia</span>
+            <span className="text-[var(--text-muted)] font-receipt-mono">Chain ID: 91342</span>
           </div>
 
           <div className="hidden sm:block text-[var(--border-color)]">|</div>
 
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[var(--accent-mint)]" />
-            <span className="font-bold text-[var(--text-primary)]">Powered by Groq</span>
+            <span className="font-bold text-[var(--text-primary)] font-receipt-mono">Powered by Groq</span>
           </div>
         </div>
       </div>

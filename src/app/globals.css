@@ -1,59 +1,79 @@
 @import "tailwindcss";
 
 :root {
-  --bg-page: #FAF8FF;
-  --bg-hero: radial-gradient(120% 120% at 50% 0%, rgba(123, 79, 242, 0.09) 0%, rgba(0, 229, 199, 0.06) 45%, #FAF8FF 100%);
-  --bg-header: rgba(250, 248, 255, 0.88);
+  --ink: #0E0D12;
+  --paper: #F7F5F0;
+  --violet: #7B4FF2;
+  --mint: #00D9B5;
+  --graphite: #6B6578;
+
+  --bg-page: #F7F5F0;
+  --bg-hero: #F7F5F0;
+  --bg-header: rgba(247, 245, 240, 0.9);
   --bg-card: #FFFFFF;
-  --bg-card-subtle: #F3EEFF;
+  --bg-card-subtle: #EFECE6;
   --bg-chat-ai: #FFFFFF;
   --bg-chat-user: linear-gradient(135deg, #7B4FF2 0%, #6366F1 100%);
-  --border-color: #E4DCF6;
-  --border-card: #E2D9F3;
-  --text-primary: #0F0C20;
-  --text-secondary: #4A4465;
-  --text-muted: #6B658B;
-  --accent-violet: #6D28D9;
-  --accent-violet-bg: rgba(109, 40, 217, 0.09);
-  --accent-violet-border: rgba(109, 40, 217, 0.25);
-  --accent-mint: #0D9488;
-  --accent-mint-badge: #0F766E;
-  --accent-mint-bg: rgba(13, 148, 136, 0.12);
-  --card-shadow: 0 4px 20px -2px rgba(109, 40, 217, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
-  --card-hover-shadow: 0 12px 30px -4px rgba(109, 40, 217, 0.16);
-  --card-hover-border: rgba(109, 40, 217, 0.4);
+  --border-color: #E2DDD5;
+  --border-card: #DBD5C9;
+  --text-primary: #0E0D12;
+  --text-secondary: #4A4656;
+  --text-muted: #6B6578;
+  --accent-violet: #7B4FF2;
+  --accent-violet-bg: rgba(123, 79, 242, 0.08);
+  --accent-violet-border: rgba(123, 79, 242, 0.25);
+  --accent-mint: #00D9B5;
+  --accent-mint-badge: #059669;
+  --accent-mint-bg: rgba(0, 217, 181, 0.12);
+  --card-shadow: 0 10px 30px -8px rgba(14, 13, 18, 0.1), 0 4px 12px -2px rgba(0, 0, 0, 0.04);
+  --card-hover-shadow: 0 20px 40px -12px rgba(14, 13, 18, 0.15);
+  --card-hover-border: rgba(123, 79, 242, 0.4);
 }
 
 .dark {
-  --bg-page: #12102B;
-  --bg-hero: radial-gradient(120% 120% at 50% 0%, rgba(123, 79, 242, 0.15) 0%, rgba(0, 229, 199, 0.08) 50%, #12102B 100%);
-  --bg-header: rgba(18, 16, 43, 0.85);
-  --bg-card: #1B173E;
-  --bg-card-subtle: #141133;
-  --bg-chat-ai: #1B173E;
+  --ink: #0E0D12;
+  --paper: #F7F5F0;
+  --violet: #7B4FF2;
+  --mint: #00D9B5;
+  --graphite: #6B6578;
+
+  --bg-page: #0E0D12;
+  --bg-hero: #0E0D12;
+  --bg-header: rgba(14, 13, 18, 0.88);
+  --bg-card: #17161F;
+  --bg-card-subtle: #1F1D2B;
+  --bg-chat-ai: #17161F;
   --bg-chat-user: linear-gradient(135deg, #7B4FF2 0%, #6366F1 100%);
-  --border-color: #2E265C;
-  --border-card: #2E265C;
-  --text-primary: #F1F0FB;
-  --text-secondary: #9E9BB9;
-  --text-muted: #737096;
+  --border-color: #272433;
+  --border-card: #2E2B3D;
+  --text-primary: #F7F5F0;
+  --text-secondary: #A39EB2;
+  --text-muted: #6B6578;
   --accent-violet: #7B4FF2;
   --accent-violet-bg: rgba(123, 79, 242, 0.15);
   --accent-violet-border: rgba(123, 79, 242, 0.35);
-  --accent-mint: #00E5C7;
-  --accent-mint-badge: #00E5C7;
-  --accent-mint-bg: rgba(0, 229, 199, 0.1);
-  --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
-  --card-hover-shadow: 0 16px 36px -6px rgba(123, 79, 242, 0.3);
+  --accent-mint: #00D9B5;
+  --accent-mint-badge: #00D9B5;
+  --accent-mint-bg: rgba(0, 217, 181, 0.12);
+  --card-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.6);
+  --card-hover-shadow: 0 24px 48px -12px rgba(123, 79, 242, 0.25);
   --card-hover-border: rgba(123, 79, 242, 0.5);
 }
 
 body {
   background-color: var(--bg-page);
   color: var(--text-primary);
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: var(--font-geist-sans), system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   min-height: 100vh;
   transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.font-serif-headline {
+  font-family: Cambria, Georgia, 'Times New Roman', serif;
+}
+
+.font-receipt-mono {
+  font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 /* Custom subtle scrollbar */
@@ -75,15 +95,21 @@ body {
   background: var(--accent-violet);
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px) rotate(-1deg);
+@keyframes stampRotated {
+  0% {
+    opacity: 0;
+    transform: scale(2.5) rotate(-20deg);
   }
-  50% {
-    transform: translateY(-10px) rotate(1deg);
+  60% {
+    opacity: 1;
+    transform: scale(0.95) rotate(-5deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-6deg);
   }
 }
 
-.animate-float {
-  animation: float 6s ease-in-out infinite;
+.animate-stamp {
+  animation: stampRotated 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
