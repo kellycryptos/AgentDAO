@@ -85,10 +85,12 @@ function ProposalItem({ id }: ProposalItemProps) {
   });
 
   const [voteType, setVoteType] = useState<boolean | null>(null);
+  const [isFinalizingAction, setIsFinalizingAction] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
 
   const handleVote = async (support: boolean) => {
     setLocalError(null);
+    setIsFinalizingAction(false);
     setVoteType(support);
     try {
       await writeContractAsync({
@@ -96,6 +98,22 @@ function ProposalItem({ id }: ProposalItemProps) {
         abi: PROPOSAL_REGISTRY_ABI,
         functionName: "vote",
         args: [id, support],
+      });
+      refetch();
+    } catch (err: any) {
+      setLocalError(parseFriendlyError(err));
+    }
+  };
+
+  const handleFinalize = async () => {
+    setLocalError(null);
+    setIsFinalizingAction(true);
+    try {
+      await writeContractAsync({
+        address: PROPOSAL_REGISTRY_ADDRESS,
+        abi: PROPOSAL_REGISTRY_ABI,
+        functionName: "finalizeProposal",
+        args: [id],
       });
       refetch();
     } catch (err: any) {
@@ -116,7 +134,7 @@ function ProposalItem({ id }: ProposalItemProps) {
     );
   }
 
-  const { title, summary, amount, proposer, yesVotes, noVotes, createdAt } = proposal;
+  const { title, summary, amount, proposer, yesVotes, noVotes, createdAt, deadline, finalized } = proposal;
   const formattedAmount = formatAmountDisplay(amount);
   const formattedDate = new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
     month: "short",
@@ -125,6 +143,23 @@ function ProposalItem({ id }: ProposalItemProps) {
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const nowSec = Math.floor(Date.now() / 1000);
+  const deadlineNum = Number(deadline || BigInt(0));
+  const isExpired = deadlineNum > 0 && nowSec >= deadlineNum;
+  const isPassed = yesVotes > noVotes;
+
+  const getTimeRemainingText = () => {
+    if (!deadlineNum) return "No Deadline";
+    const diff = deadlineNum - nowSec;
+    if (diff <= 0) return "Voting Closed";
+    const days = Math.floor(diff / 86400);
+    const hours = Math.floor((diff % 86400) / 3600);
+    const mins = Math.floor((diff % 3600) / 60);
+    if (days > 0) return `${days}d ${hours}h left`;
+    if (hours > 0) return `${hours}h ${mins}m left`;
+    return `${mins}m left`;
+  };
 
   return (
     <div className="bg-[var(--bg-card)] border border-[var(--border-color)] hover:border-[var(--accent-violet)] transition-all rounded-2xl p-5 sm:p-6 shadow-md space-y-4 relative overflow-hidden group">
@@ -137,8 +172,30 @@ function ProposalItem({ id }: ProposalItemProps) {
             <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-violet-bg)] text-[var(--accent-violet)] border border-[var(--accent-violet)]/30 font-semibold">
               Proposal #{id.toString()}
             </span>
+
+            {/* Status Badges */}
+            {finalized ? (
+              isPassed ? (
+                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-extrabold flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3 text-emerald-500" /> PASSED
+                </span>
+              ) : (
+                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-extrabold flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 text-rose-500" /> REJECTED
+                </span>
+              )
+            ) : isExpired ? (
+              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-extrabold flex items-center gap-1">
+                <Clock className="w-3 h-3 text-amber-500" /> CLOSED (PENDING FINALIZATION)
+              </span>
+            ) : (
+              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-mint-bg)] text-[var(--accent-mint)] border border-[var(--accent-mint)]/30 font-semibold flex items-center gap-1">
+                <Clock className="w-3 h-3 text-[var(--accent-mint)]" /> {getTimeRemainingText()}
+              </span>
+            )}
+
             <span className="text-xs text-[var(--text-muted)] font-mono flex items-center gap-1">
-              <Clock className="w-3.5 h-3.5 opacity-60" /> {formattedDate}
+              {formattedDate}
             </span>
           </div>
           <h3 className="font-bold text-base sm:text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-violet)] transition-colors">{title}</h3>
@@ -175,7 +232,7 @@ function ProposalItem({ id }: ProposalItemProps) {
         </div>
       </div>
 
-      {/* Voting Tally & Buttons */}
+      {/* Voting Tally & Action Buttons */}
       <div className="pt-2 border-t border-[var(--border-color)] space-y-3">
         <div className="grid grid-cols-2 gap-3 text-center">
           <div className="bg-emerald-500/10 border border-emerald-500/30 p-2.5 rounded-xl">
@@ -188,8 +245,36 @@ function ProposalItem({ id }: ProposalItemProps) {
           </div>
         </div>
 
-        {/* Voting Action */}
-        {!isConnected ? (
+        {/* Voting / Finalize Action Section */}
+        {finalized ? (
+          <div className={`text-xs p-3 rounded-xl border text-center font-bold flex items-center justify-center gap-2 ${
+            isPassed
+              ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/30"
+              : "bg-rose-500/10 text-rose-600 dark:text-rose-300 border-rose-500/30"
+          }`}>
+            {isPassed ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <AlertCircle className="w-4 h-4 text-rose-500" />}
+            <span>Proposal Ratification Complete — Status: {isPassed ? "PASSED" : "REJECTED"}</span>
+          </div>
+        ) : isExpired ? (
+          <button
+            type="button"
+            onClick={handleFinalize}
+            disabled={isWritePending || isConfirming || !isConnected || !isCorrectNetwork}
+            className="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-extrabold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
+          >
+            {isWritePending && isFinalizingAction ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Signing Finalize Tx...</span>
+              </>
+            ) : (
+              <>
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Finalize Proposal Onchain</span>
+              </>
+            )}
+          </button>
+        ) : !isConnected ? (
           <div className="text-xs text-[var(--text-muted)] text-center italic py-2 bg-[var(--bg-card-subtle)] rounded-xl border border-[var(--border-color)]">
             Connect wallet on GIWA Sepolia to cast your vote.
           </div>
@@ -210,7 +295,7 @@ function ProposalItem({ id }: ProposalItemProps) {
               disabled={isWritePending || isConfirming}
               className="flex-1 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
-              {isWritePending && voteType === true ? (
+              {isWritePending && !isFinalizingAction && voteType === true ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <ThumbsUp className="w-3.5 h-3.5" />
@@ -224,7 +309,7 @@ function ProposalItem({ id }: ProposalItemProps) {
               disabled={isWritePending || isConfirming}
               className="flex-1 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
-              {isWritePending && voteType === false ? (
+              {isWritePending && !isFinalizingAction && voteType === false ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 <ThumbsDown className="w-3.5 h-3.5" />
@@ -244,7 +329,7 @@ function ProposalItem({ id }: ProposalItemProps) {
         {isConfirmed && hash && (
           <div className="text-xs text-[var(--accent-mint)] bg-[var(--accent-mint-bg)] p-2.5 rounded-xl flex items-center justify-between flex-wrap gap-2 border border-[var(--accent-mint)]/30 font-medium">
             <span className="flex items-center gap-1.5 font-medium">
-              <CheckCircle2 className="w-4 h-4" /> Vote Recorded Onchain!
+              <CheckCircle2 className="w-4 h-4" /> {isFinalizingAction ? "Proposal Finalized Onchain!" : "Vote Recorded Onchain!"}
             </span>
             <a
               href={`https://sepolia-explorer.giwa.io/tx/${hash}`}

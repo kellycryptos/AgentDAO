@@ -51,7 +51,7 @@ export function SubmitOnchainButton({ title, summary, amount }: SubmitOnchainBut
         address: PROPOSAL_REGISTRY_ADDRESS,
         abi: PROPOSAL_REGISTRY_ABI,
         functionName: "createProposal",
-        args: [title, summary, parsedAmount],
+        args: [title, summary, parsedAmount, BigInt(604800)],
       });
     } catch (err: any) {
       setLocalError(parseFriendlyError(err));

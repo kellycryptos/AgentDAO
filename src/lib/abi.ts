@@ -1,5 +1,5 @@
 export const PROPOSAL_REGISTRY_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  "0xcCe989122524D99D05C9EE871505c11bE935deCb") as `0x${string}`;
+  "0x92a76b5CCCfBB56106bE22d15558009376496Ff5") as `0x${string}`;
 
 export const PROPOSAL_REGISTRY_ABI = [
   {
@@ -10,6 +10,7 @@ export const PROPOSAL_REGISTRY_ABI = [
       { name: "title", type: "string" },
       { name: "summary", type: "string" },
       { name: "amount", type: "uint256" },
+      { name: "votingPeriodSeconds", type: "uint256" },
     ],
     outputs: [{ name: "", type: "uint256" }],
   },
@@ -21,6 +22,13 @@ export const PROPOSAL_REGISTRY_ABI = [
       { name: "proposalId", type: "uint256" },
       { name: "support", type: "bool" },
     ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "finalizeProposal",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "proposalId", type: "uint256" }],
     outputs: [],
   },
   {
@@ -39,6 +47,8 @@ export const PROPOSAL_REGISTRY_ABI = [
           { name: "yesVotes", type: "uint256" },
           { name: "noVotes", type: "uint256" },
           { name: "createdAt", type: "uint256" },
+          { name: "deadline", type: "uint256" },
+          { name: "finalized", type: "bool" },
         ],
       },
     ],
@@ -66,6 +76,7 @@ export const PROPOSAL_REGISTRY_ABI = [
     inputs: [
       { name: "id", type: "uint256", indexed: true },
       { name: "proposer", type: "address", indexed: true },
+      { name: "deadline", type: "uint256", indexed: false },
     ],
   },
   {
@@ -75,6 +86,14 @@ export const PROPOSAL_REGISTRY_ABI = [
       { name: "id", type: "uint256", indexed: true },
       { name: "voter", type: "address", indexed: true },
       { name: "support", type: "bool", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "ProposalFinalized",
+    inputs: [
+      { name: "id", type: "uint256", indexed: true },
+      { name: "passed", type: "bool", indexed: false },
     ],
   },
   {
@@ -88,6 +107,21 @@ export const PROPOSAL_REGISTRY_ABI = [
   {
     type: "error",
     name: "ProposalDoesNotExist",
+    inputs: [{ name: "proposalId", type: "uint256" }],
+  },
+  {
+    type: "error",
+    name: "VotingClosed",
+    inputs: [{ name: "proposalId", type: "uint256" }],
+  },
+  {
+    type: "error",
+    name: "VotingStillOpen",
+    inputs: [{ name: "proposalId", type: "uint256" }],
+  },
+  {
+    type: "error",
+    name: "AlreadyFinalized",
     inputs: [{ name: "proposalId", type: "uint256" }],
   },
 ] as const;

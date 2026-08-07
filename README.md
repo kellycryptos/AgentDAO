@@ -31,8 +31,8 @@ Running a DAO is still too hard for everyday groups. Wallets, gas, and governanc
 
 - **Network:** GIWA Sepolia (Chain ID: `91342`)
 - **Contract Name:** `ProposalRegistry`
-- **Verified Contract Address:** [`0xcCe989122524D99D05C9EE871505c11bE935deCb`](https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb)
-- **Explorer:** [GIWA Sepolia Blockscout Explorer](https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb)
+- **Verified Contract Address:** [`0x92a76b5CCCfBB56106bE22d15558009376496Ff5`](https://sepolia-explorer.giwa.io/address/0x92a76b5CCCfBB56106bE22d15558009376496Ff5#code)
+- **Explorer:** [GIWA Sepolia Blockscout Explorer](https://sepolia-explorer.giwa.io/address/0x92a76b5CCCfBB56106bE22d15558009376496Ff5#code)
 
 ## Features
 
@@ -42,7 +42,7 @@ Running a DAO is still too hard for everyday groups. Wallets, gas, and governanc
 | ✍️ **AI proposal writer** | **Live** | Converts plain language into structured, votable proposal drafts via Groq AI (Llama 3.3 70B) |
 | 📝 **Discussion Summarizer** | **Live** | Paste Discord/Telegram threads to extract core decisions, pros/cons, consensus, and pre-fill proposal drafts |
 | 🔗 **Reown AppKit Wallet Connection** | **Live** | Web3 wallet connection configured specifically for GIWA Sepolia custom chain |
-| 🗳️ **GIWA Sepolia Onchain Voting** | **Live** | Register AI proposal drafts onchain and cast Yes/No votes on contract [`0xcCe989122524D99D05C9EE871505c11bE935deCb`](https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb) |
+| 🗳️ **GIWA Sepolia Onchain Voting & Deadlines** | **Live** | Register AI proposal drafts onchain with a 7-day voting window, cast Yes/No votes, and execute finalization on contract [`0x92a76b5CCCfBB56106bE22d15558009376496Ff5`](https://sepolia-explorer.giwa.io/address/0x92a76b5CCCfBB56106bE22d15558009376496Ff5#code) |
 | 💰 **Agent Treasury** | *Planned (Q4 2026)* | AI-assisted fund management against member-set rules |
 
 ## Live Demo

@@ -1,0 +1,41 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\HP\\Downloads\\AgentDao\\contracts\\ProposalRegistry.sol": {
+      "lastModificationDate": 1786088078401,
+      "contentHash": "80565e9eac56dc89b370b71a1657523a",
+      "sourceName": "contracts/ProposalRegistry.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ProposalRegistry"
+      ]
+    }
+  }
+}
