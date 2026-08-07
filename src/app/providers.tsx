@@ -56,6 +56,9 @@ createAppKit({
   },
   features: {
     analytics: false,
+    email: false,
+    socials: [],
+    emailShowWallets: true,
   },
 });
 
