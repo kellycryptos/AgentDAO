@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { useAccount, useChainId, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { parseEther } from "viem";
 import { PROPOSAL_REGISTRY_ADDRESS, PROPOSAL_REGISTRY_ABI } from "@/lib/abi";
 import { ExternalLink, Loader2, Send, CheckCircle2, AlertCircle, Sparkles, ArrowUpRight } from "lucide-react";
 
@@ -38,16 +37,16 @@ export function SubmitOnchainButton({ title, summary, amount }: SubmitOnchainBut
   const [localError, setLocalError] = useState<string | null>(null);
 
   // Extract number from amount string (e.g. "2000 USDC" -> 2000)
-  const parseAmountToWei = (amountStr: string): bigint => {
+  const parseAmountToPlainNumber = (amountStr: string): bigint => {
     const cleaned = amountStr.replace(/[^0-9.]/g, "");
-    const num = parseFloat(cleaned) || 0;
-    return parseEther(num.toString());
+    const num = Math.floor(parseFloat(cleaned) || 0);
+    return BigInt(num);
   };
 
   const handleSubmit = async () => {
     setLocalError(null);
     try {
-      const parsedAmount = parseAmountToWei(amount);
+      const parsedAmount = parseAmountToPlainNumber(amount);
       await writeContractAsync({
         address: PROPOSAL_REGISTRY_ADDRESS,
         abi: PROPOSAL_REGISTRY_ABI,

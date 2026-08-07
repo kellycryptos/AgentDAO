@@ -8,7 +8,6 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
-import { formatEther } from "viem";
 import { PROPOSAL_REGISTRY_ADDRESS, PROPOSAL_REGISTRY_ABI } from "@/lib/abi";
 import {
   ThumbsUp,
@@ -46,6 +45,14 @@ function parseFriendlyError(error: any): string {
   }
   return msg;
 }
+
+const formatAmountDisplay = (rawAmount: bigint): string => {
+  if (rawAmount >= 10n ** 15n) {
+    const scaled = Number(rawAmount / 10n ** 18n);
+    return `${scaled.toLocaleString()} USDC`;
+  }
+  return `${Number(rawAmount).toLocaleString()} USDC`;
+};
 
 function ProposalItem({ id }: ProposalItemProps) {
   const { address, isConnected } = useAccount();
@@ -107,7 +114,7 @@ function ProposalItem({ id }: ProposalItemProps) {
   }
 
   const { title, summary, amount, proposer, yesVotes, noVotes, createdAt } = proposal;
-  const formattedAmount = formatEther(amount);
+  const formattedAmount = formatAmountDisplay(amount);
   const formattedDate = new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
@@ -138,7 +145,7 @@ function ProposalItem({ id }: ProposalItemProps) {
           <DollarSign className="w-4 h-4 text-[var(--accent-mint)]" />
           <div>
             <div className="text-[10px] uppercase text-[var(--text-muted)] font-mono">Amount</div>
-            <div className="text-xs sm:text-sm font-bold font-mono text-[var(--accent-mint)]">{formattedAmount} ETH</div>
+            <div className="text-xs sm:text-sm font-bold font-mono text-[var(--accent-mint)]">{formattedAmount}</div>
           </div>
         </div>
       </div>
