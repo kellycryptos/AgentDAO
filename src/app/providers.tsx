@@ -5,7 +5,7 @@ import { createAppKit } from "@reown/appkit/react";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { WagmiProvider } from "wagmi";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { defineChain } from "viem";
+import { defineChain, http, fallback } from "viem";
 
 export const giwaSepolia = defineChain({
   id: 91342,
@@ -16,7 +16,12 @@ export const giwaSepolia = defineChain({
     decimals: 18,
   },
   rpcUrls: {
-    default: { http: ["https://sepolia-rpc.giwa.io"] },
+    default: {
+      http: [
+        "https://sepolia-rpc.giwa.io",
+        "https://sepolia-explorer.giwa.io/api/eth-rpc",
+      ],
+    },
   },
   blockExplorers: {
     default: { name: "GIWA Explorer", url: "https://sepolia-explorer.giwa.io" },
@@ -29,6 +34,12 @@ export const projectId =
 export const wagmiAdapter = new WagmiAdapter({
   networks: [giwaSepolia],
   projectId,
+  transports: {
+    [giwaSepolia.id]: fallback([
+      http("https://sepolia-rpc.giwa.io", { retryCount: 3, retryDelay: 1000 }),
+      http("https://sepolia-explorer.giwa.io/api/eth-rpc", { retryCount: 3, retryDelay: 1000 }),
+    ]),
+  },
   ssr: true,
 });
 
@@ -49,7 +60,17 @@ createAppKit({
 });
 
 export function Providers({ children }: { children: ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(
+    () =>
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            retry: 3,
+            retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 8000),
+          },
+        },
+      })
+  );
 
   return (
     <WagmiProvider config={wagmiAdapter.wagmiConfig}>
@@ -59,3 +80,4 @@ export function Providers({ children }: { children: ReactNode }) {
     </WagmiProvider>
   );
 }
+

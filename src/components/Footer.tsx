@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Sparkles, ExternalLink, ShieldCheck, Heart } from "lucide-react";
+import { Sparkles, ExternalLink, ShieldCheck } from "lucide-react";
 import { PROPOSAL_REGISTRY_ADDRESS } from "@/lib/abi";
 
 export function Footer() {
@@ -133,10 +133,8 @@ export function Footer() {
         {/* Footer Bottom Bar */}
         <div className="pt-8 border-t border-[var(--border-color)] flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[var(--text-muted)]">
           <p>© {new Date().getFullYear()} AgentDAO. MIT License.</p>
-          <div className="flex items-center gap-1 text-xs">
-            <span>Built with</span>
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
-            <span>for the GIWA Ecosystem</span>
+          <div className="text-xs font-mono text-[var(--accent-mint)]">
+            Built for the GIWA Ecosystem
           </div>
         </div>
       </div>

@@ -149,7 +149,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-[#7B4FF2] selection:text-white transition-colors duration-200">
-      {/* ── HEADER ── */}
+      {/* HEADER */}
       <header className="border-b border-[var(--border-color)] bg-[var(--bg-header)] backdrop-blur-md sticky top-0 z-20 px-4 sm:px-6 py-4 transition-colors">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -183,7 +183,7 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ── HERO SECTION ── */}
+      {/* HERO SECTION */}
       <section className="relative overflow-hidden border-b border-[var(--border-color)] transition-colors">
         {/* Ambient glow orbs */}
         <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-[#7B4FF2]/10 rounded-full blur-3xl pointer-events-none" />
@@ -219,7 +219,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── ABOUT SECTION ── */}
+      {/* ABOUT SECTION */}
       <section className="border-b border-[var(--border-color)] transition-colors">
         <div className="max-w-5xl mx-auto px-6 py-16 sm:py-20 text-center">
           <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] mb-5">
@@ -239,7 +239,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── HOW IT WORKS ── */}
+      {/* HOW IT WORKS */}
       <section className="border-b border-[var(--border-color)] transition-colors">
         <div className="max-w-5xl mx-auto px-6 py-16 sm:py-20">
           <h3 className="text-2xl sm:text-3xl font-bold text-[var(--text-primary)] text-center mb-12">
@@ -283,7 +283,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── WHY GIWA SECTION ── */}
+      {/* WHY GIWA SECTION */}
       <section className="border-b border-[var(--border-color)] transition-colors bg-[var(--bg-card-subtle)]">
         <div className="max-w-5xl mx-auto px-6 py-16 sm:py-20">
           <div className="text-center max-w-2xl mx-auto mb-12">
@@ -332,7 +332,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── FEATURES ── */}
+      {/* FEATURES */}
       <section className="border-b border-[var(--border-color)] transition-colors">
         <div className="max-w-5xl mx-auto px-6 py-16 sm:py-20">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
@@ -387,7 +387,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── PROPOSAL GENERATOR (Chat) ── */}
+      {/* PROPOSAL GENERATOR */}
       <div id="chat-section" ref={chatSectionRef} className="scroll-mt-20" />
       <main className="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 flex flex-col">
         {/* Section label */}
@@ -397,7 +397,7 @@ export default function Home() {
             Proposal Generator
           </span>
           <span className="text-xs text-[var(--text-muted)] font-mono">
-            — describe your request below
+            (describe your request below)
           </span>
         </div>
 
@@ -602,10 +602,10 @@ export default function Home() {
         </form>
       </main>
 
-      {/* ── ONCHAIN PROPOSALS LIST ── */}
+      {/* ONCHAIN PROPOSALS LIST */}
       <ProposalList />
 
-      {/* ── FOOTER ── */}
+      {/* FOOTER */}
       <Footer />
     </div>
   );

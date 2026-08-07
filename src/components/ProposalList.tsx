@@ -256,7 +256,11 @@ export function ProposalList() {
     address: PROPOSAL_REGISTRY_ADDRESS,
     abi: PROPOSAL_REGISTRY_ABI,
     functionName: "proposalCount",
-    query: { refetchInterval: 4000 },
+    query: {
+      refetchInterval: 5000,
+      retry: 3,
+      retryDelay: 1000,
+    },
   });
 
   const proposalCountNum = count ? Number(count) : 0;
