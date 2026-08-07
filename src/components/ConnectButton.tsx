@@ -21,7 +21,7 @@ export function ConnectButton() {
     return (
       <button
         disabled
-        className="px-4 py-2 bg-[#1B173E] text-[#9E9BB9] text-xs font-semibold rounded-xl border border-[#2E265C] opacity-50"
+        className="px-4 py-2 bg-[var(--bg-card)] text-[var(--text-muted)] text-xs font-semibold rounded-xl border border-[var(--border-color)] opacity-50"
       >
         Loading...
       </button>
@@ -34,7 +34,7 @@ export function ConnectButton() {
         onClick={() => open()}
         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-[#7B4FF2] to-[#956BFB] hover:from-[#956BFB] hover:to-[#7B4FF2] text-white text-xs font-bold tracking-wide shadow-md shadow-[#7B4FF2]/20 hover:shadow-[#7B4FF2]/40 transition-all cursor-pointer"
       >
-        <Wallet className="w-4 h-4 text-[#00E5C7]" />
+        <Wallet className="w-4 h-4 text-emerald-300 dark:text-[#00E5C7]" />
         <span>Connect Wallet</span>
       </button>
     );
@@ -50,9 +50,9 @@ export function ConnectButton() {
             ? switchChain({ chainId: giwaSepolia.id })
             : open({ view: "Networks" })
         }
-        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-semibold hover:bg-amber-500/20 transition-all cursor-pointer"
+        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 text-xs font-semibold hover:bg-amber-500/20 transition-all cursor-pointer"
       >
-        <AlertTriangle className="w-4 h-4 text-amber-400 animate-pulse" />
+        <AlertTriangle className="w-4 h-4 text-amber-500 dark:text-amber-400 animate-pulse" />
         <span>Switch to GIWA Sepolia</span>
       </button>
     );
@@ -65,19 +65,19 @@ export function ConnectButton() {
   return (
     <div className="flex items-center gap-2">
       {/* Network Badge */}
-      <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[#00E5C7]/10 border border-[#00E5C7]/30 text-[#00E5C7] text-xs font-mono">
-        <span className="w-2 h-2 rounded-full bg-[#00E5C7] animate-pulse" />
+      <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-[var(--accent-mint-bg)] border border-[var(--accent-mint)]/30 text-[var(--accent-mint)] text-xs font-mono font-medium">
+        <span className="w-2 h-2 rounded-full bg-[var(--accent-mint)] animate-pulse" />
         <span>GIWA Sepolia</span>
       </div>
 
       {/* Connected Account Button */}
       <button
         onClick={() => open()}
-        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[#1B173E] hover:bg-[#252054] text-[#F1F0FB] text-xs font-mono font-semibold border border-[#2E265C] hover:border-[#7B4FF2]/50 transition-all cursor-pointer shadow-sm"
+        className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-subtle)] text-[var(--text-primary)] text-xs font-mono font-semibold border border-[var(--border-color)] hover:border-[var(--accent-violet)] transition-all cursor-pointer shadow-sm"
       >
-        <div className="w-2 h-2 rounded-full bg-emerald-400 sm:hidden" />
+        <div className="w-2 h-2 rounded-full bg-emerald-500 sm:hidden" />
         <span>{truncatedAddress}</span>
-        <ChevronDown className="w-3.5 h-3.5 text-[#9E9BB9]" />
+        <ChevronDown className="w-3.5 h-3.5 text-[var(--text-muted)]" />
       </button>
     </div>
   );

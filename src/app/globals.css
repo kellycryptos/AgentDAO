@@ -1,27 +1,51 @@
 @import "tailwindcss";
 
-@theme inline {
-  --color-brand-bg: #12102B;
-  --color-brand-card: #1B173E;
-  --color-brand-card-hover: #231E4F;
-  --color-brand-border: #2E265C;
-  --color-brand-accent: #7B4FF2;
-  --color-brand-accent-glow: #956BFB;
-  --color-brand-mint: #00E5C7;
-  --color-brand-text: #F1F0FB;
-  --color-brand-muted: #9E9BB9;
+:root {
+  --bg-page: #F8F9FD;
+  --bg-header: rgba(248, 249, 253, 0.85);
+  --bg-card: #FFFFFF;
+  --bg-card-subtle: #F1F3FA;
+  --bg-chat-ai: #FFFFFF;
+  --bg-chat-user: #7B4FF2;
+  --border-color: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-secondary: #475569;
+  --text-muted: #64748B;
+  --accent-violet: #6D28D9;
+  --accent-violet-bg: rgba(109, 40, 217, 0.08);
+  --accent-mint: #0D9488;
+  --accent-mint-badge: #0F766E;
+  --accent-mint-bg: rgba(13, 148, 136, 0.1);
+  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+  --card-hover-border: rgba(109, 40, 217, 0.35);
 }
 
-:root {
-  --background: #12102B;
-  --foreground: #F1F0FB;
+.dark {
+  --bg-page: #12102B;
+  --bg-header: rgba(18, 16, 43, 0.85);
+  --bg-card: #1B173E;
+  --bg-card-subtle: #12102B;
+  --bg-chat-ai: #1B173E;
+  --bg-chat-user: #7B4FF2;
+  --border-color: #2E265C;
+  --text-primary: #F1F0FB;
+  --text-secondary: #9E9BB9;
+  --text-muted: #737096;
+  --accent-violet: #7B4FF2;
+  --accent-violet-bg: rgba(123, 79, 242, 0.15);
+  --accent-mint: #00E5C7;
+  --accent-mint-badge: #00E5C7;
+  --accent-mint-bg: rgba(0, 229, 199, 0.1);
+  --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+  --card-hover-border: rgba(123, 79, 242, 0.5);
 }
 
 body {
-  background-color: #12102B;
-  color: #F1F0FB;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Custom subtle scrollbar */
@@ -31,14 +55,14 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #12102B;
+  background: var(--bg-page);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2E265C;
+  background: var(--border-color);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7B4FF2;
+  background: var(--accent-violet);
 }
