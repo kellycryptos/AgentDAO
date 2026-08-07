@@ -36,13 +36,13 @@ Running a DAO is still too hard for everyday groups. Wallets, gas, and governanc
 
 ## Features
 
-| | |
-|---|---|
-| 💬 **Natural language interface** | Create groups, ask questions, and take action through plain conversation |
-| ✍️ **AI proposal writer** | Turns a plain-language request into a structured, votable proposal |
-| 🔗 **Reown AppKit Wallet Connection** | Seamless web3 wallet connection supporting GIWA Sepolia custom chain |
-| 🗳️ **GIWA Sepolia Onchain Voting** | Submit AI proposal drafts directly onchain and cast Yes/No votes |
-| 💰 **Agent Treasury** *(planned)* | AI-assisted fund management against member-set rules |
+| | Status | Description |
+|---|---|---|
+| 💬 **Natural language interface** | **Live** | Create groups, ask questions, and draft governance ideas in plain text |
+| ✍️ **AI proposal writer** | **Live** | Converts plain language into structured, votable proposal drafts via Groq AI (Llama 3.3 70B) |
+| 🔗 **Reown AppKit Wallet Connection** | **Live** | Web3 wallet connection configured specifically for GIWA Sepolia custom chain |
+| 🗳️ **GIWA Sepolia Onchain Voting** | **Live** | Register AI proposal drafts onchain and cast Yes/No votes on contract [`0xcCe989122524D99D05C9EE871505c11bE935deCb`](https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb) |
+| 💰 **Agent Treasury** | *Planned (Q4 2026)* | AI-assisted fund management against member-set rules |
 
 ## Live Demo
 
@@ -58,8 +58,8 @@ The agent will return a structured proposal card with an **"Submit Onchain"** bu
 ## Tech Stack
 
 - **Frontend:** Next.js (App Router), TypeScript, Tailwind CSS
-- **AI:** Groq AI (Llama 3.3 70B) for fast proposal drafting
-- **Chain:** GIWA Sepolia testnet (Chain ID: `91342`), Solidity, Hardhat
+- **AI Engine:** Groq AI (Llama 3.3 70B) for fast proposal drafting
+- **Smart Contract & Tooling:** GIWA Sepolia testnet (Chain ID: `91342`), Solidity `0.8.20`, Hardhat
 - **Wallet & Web3:** Reown AppKit, Wagmi, Viem
 - **Hosting:** Vercel
 
@@ -98,11 +98,11 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Roadmap
 
-| Phase | Target | Scope |
+| Phase | Status | Scope |
 |---|---|---|
-| **Phase 1** | Now → Q3 2026 | Core AI chat + proposal creation + basic onchain voting on GIWA testnet |
-| **Phase 2** | Q4 2026 | Full voting system + Agent Treasury + private mainnet testing |
-| **Phase 3** | 2027 | Public mainnet launch on GIWA + advanced agent features |
+| **Phase 1** | **[LIVE]** | Core AI chat + proposal creation + onchain proposal registration & voting on GIWA Sepolia testnet |
+| **Phase 2** | Upcoming (Q4 2026) | Full voting analytics + Agent Treasury fund execution |
+| **Phase 3** | Upcoming (2027) | Public mainnet launch on GIWA + advanced autonomous agent governance |
 
 ## Why GIWA
 
