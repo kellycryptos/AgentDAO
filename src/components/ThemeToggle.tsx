@@ -9,7 +9,7 @@ export function ThemeToggle() {
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem("agentdao_theme") as "dark" | "light" | null;
+    const stored = (localStorage.getItem("agentdao_theme") || localStorage.getItem("theme")) as "dark" | "light" | null;
     if (stored) {
       setTheme(stored);
       if (stored === "dark") {
@@ -18,14 +18,8 @@ export function ThemeToggle() {
         document.documentElement.classList.remove("dark");
       }
     } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      const initialTheme = prefersDark ? "dark" : "dark"; // Default to dark for AgentDAO brand consistency
-      setTheme(initialTheme);
-      if (initialTheme === "dark") {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
+      setTheme("dark");
+      document.documentElement.classList.add("dark");
     }
   }, []);
 
