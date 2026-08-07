@@ -108,15 +108,6 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 AgentDAO is built for the [GIWA](https://docs.giwa.io/giwa-chain/en) ecosystem — a high-performance L2 well suited to a chat-driven, high-frequency governance tool, with the [GASOK](https://giwa.io/gasok) program offering infrastructure support and access to an established user base.
 
-## Team
-
-| Name | Role | Location |
-|---|---|---|
-| Kelvin Mba | Founder & Lead Developer | Abuja, Nigeria |
-| Godsreward Ginikanwa | Co-Founder | Casablanca-Settat, Morocco |
-| Okorie Kosisochukwu | Product Lead | Lagos, Nigeria |
-| Austine Ndukwe | Community Lead | Lagos, Nigeria |
-
 ## Contributing
 
 This project is in early, active development. Issues and pull requests are welcome — please open an issue first to discuss any significant change.

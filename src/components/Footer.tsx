@@ -90,17 +90,6 @@ export function Footer() {
                   Telegram (coming soon)
                 </span>
               </li>
-              <li>
-                <a
-                  href="https://giwa.io/gasok"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-[var(--accent-violet)] transition-colors inline-flex items-center gap-1"
-                >
-                  GASOK Builder Program
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </li>
             </ul>
           </div>
 
