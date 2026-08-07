@@ -323,7 +323,6 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[var(--accent-mint)]" />
             <span className="font-bold text-[var(--text-primary)]">Powered by Groq</span>
-            <span className="text-[var(--text-muted)]">Llama 3.3 70B</span>
           </div>
         </div>
       </div>
