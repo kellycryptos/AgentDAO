@@ -74,3 +74,16 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--accent-violet);
 }
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(1deg);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
