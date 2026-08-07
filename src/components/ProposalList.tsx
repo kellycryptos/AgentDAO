@@ -46,9 +46,12 @@ function parseFriendlyError(error: any): string {
   return msg;
 }
 
+const THRESHOLD = BigInt("1000000000000000");
+const WEI_UNIT = BigInt("1000000000000000000");
+
 const formatAmountDisplay = (rawAmount: bigint): string => {
-  if (rawAmount >= 10n ** 15n) {
-    const scaled = Number(rawAmount / 10n ** 18n);
+  if (rawAmount >= THRESHOLD) {
+    const scaled = Number(rawAmount / WEI_UNIT);
     return `${scaled.toLocaleString()} USDC`;
   }
   return `${Number(rawAmount).toLocaleString()} USDC`;
