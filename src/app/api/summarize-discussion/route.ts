@@ -22,49 +22,27 @@ export async function POST(req: NextRequest) {
     if (apiKey && apiKey.trim() !== "") {
       try {
         const groq = new Groq({ apiKey });
-        
-        // Try llama-3.3-70b-versatile first, fallback to qwen/qwen3.6-27b if needed
-        let chatCompletion;
-        try {
-          chatCompletion = await groq.chat.completions.create({
-            model: "llama-3.3-70b-versatile",
-            temperature: 0.3,
-            max_completion_tokens: 1024,
-            messages: [
-              {
-                role: "system",
-                content: `You are AgentDAO's community discussion summarizer. Analyze the provided raw discussion thread (from Discord, Telegram, or governance forums) and extract key insights.
+        const chatCompletion = await groq.chat.completions.create({
+          model: "llama-3.3-70b-versatile",
+          temperature: 0.3,
+          max_completion_tokens: 1024,
+          messages: [
+            {
+              role: "system",
+              content: `You are AgentDAO's community discussion summarizer. Analyze the provided raw discussion thread (from Discord, Telegram, or governance forums) and extract key insights.
 Return ONLY valid JSON without any markdown formatting, commentary, or thinking tags. The JSON object must strictly match this TypeScript interface:
 {
   "decision": "1 sentence describing the core decision, proposal, or question being discussed",
   "summary": "2-3 sentences summarizing main arguments for and against, or key viewpoints raised",
   "consensus": "1 sentence detailing whether clear consensus was reached, split, or remains unresolved"
 }`,
-              },
-              {
-                role: "user",
-                content: text,
-              },
-            ],
-          });
-        } catch (mErr) {
-          console.warn("Primary model failed, trying fallback model:", mErr);
-          chatCompletion = await groq.chat.completions.create({
-            model: "qwen/qwen3.6-27b",
-            temperature: 0.3,
-            max_completion_tokens: 1024,
-            messages: [
-              {
-                role: "system",
-                content: `You are AgentDAO's community discussion summarizer. Analyze the provided raw discussion thread and return JSON with keys: "decision", "summary", "consensus".`,
-              },
-              {
-                role: "user",
-                content: text,
-              },
-            ],
-          });
-        }
+            },
+            {
+              role: "user",
+              content: text,
+            },
+          ],
+        });
 
         let textResponse = chatCompletion.choices[0]?.message?.content || "";
 
