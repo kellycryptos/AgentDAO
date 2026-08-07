@@ -16,6 +16,7 @@ import {
   Zap,
   Coins,
   Award,
+  ExternalLink,
 } from "lucide-react";
 import { ConnectButton } from "@/components/ConnectButton";
 import { SubmitOnchainButton } from "@/components/SubmitOnchainButton";
