@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="logo-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="100%" stop-color="#6D28D9"/>
+    </linearGradient>
+  </defs>
+  <!-- Background rounded rectangle -->
+  <rect width="200" height="200" rx="44" fill="url(#logo-bg)"/>
+  
+  <!-- Connecting lines from center (100,100) to 4 nodes -->
+  <line x1="100" y1="100" x2="65" y2="65" stroke="#E9D5FF" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  <line x1="100" y1="100" x2="135" y2="65" stroke="#E9D5FF" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  <line x1="100" y1="100" x2="65" y2="135" stroke="#E9D5FF" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+  <line x1="100" y1="100" x2="135" y2="135" stroke="#E9D5FF" stroke-width="8" stroke-linecap="round" opacity="0.85"/>
+
+  <!-- Top-left node circle -->
+  <circle cx="65" cy="65" r="14" fill="#FFFFFF"/>
+  <!-- Top-right node circle -->
+  <circle cx="135" cy="65" r="14" fill="#FFFFFF"/>
+  <!-- Bottom-left node circle -->
+  <circle cx="65" cy="135" r="14" fill="#FFFFFF"/>
+
+  <!-- Center Sparkle / 4-pointed Star -->
+  <path d="M 100,60 Q 100,100 60,100 Q 100,100 100,140 Q 100,100 140,100 Q 100,100 100,60 Z" fill="#FFFFFF"/>
+
+  <!-- Bottom-right mint checkmark node circle -->
+  <circle cx="135" cy="135" r="15" fill="#00E5C7"/>
+  <!-- Black checkmark inside mint circle -->
+  <path d="M 127,135 L 133,141 L 143,129" fill="none" stroke="#090D16" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

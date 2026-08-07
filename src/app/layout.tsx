@@ -17,7 +17,36 @@ export const metadata: Metadata = {
   title: "AgentDAO | AI Governance Assistant on GIWA Sepolia",
   description: "AI assistant for everyday communities to draft proposals, summarize discussions, and vote onchain on GIWA Sepolia testnet.",
   icons: {
-    icon: "/favicon.ico",
+    icon: [
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-64.png", sizes: "64x64", type: "image/png" },
+      { url: "/logo.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
+  },
+  openGraph: {
+    title: "AgentDAO | AI Governance Assistant on GIWA Sepolia",
+    description: "Turn natural language ideas into structured onchain proposals and votes on GIWA Sepolia testnet.",
+    url: "https://agent-dao-gilt.vercel.app",
+    siteName: "AgentDAO",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "AgentDAO - AI Governance on GIWA Sepolia",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "AgentDAO | AI Governance Assistant on GIWA Sepolia",
+    description: "Turn natural language ideas into structured onchain proposals and votes on GIWA Sepolia testnet.",
+    images: ["/og-image.png"],
   },
 };
 

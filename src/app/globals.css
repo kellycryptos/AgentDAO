@@ -1,42 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --bg-page: #F8F9FD;
-  --bg-header: rgba(248, 249, 253, 0.85);
+  --bg-page: #FAF8FF;
+  --bg-hero: radial-gradient(120% 120% at 50% 0%, rgba(123, 79, 242, 0.09) 0%, rgba(0, 229, 199, 0.06) 45%, #FAF8FF 100%);
+  --bg-header: rgba(250, 248, 255, 0.88);
   --bg-card: #FFFFFF;
-  --bg-card-subtle: #F1F3FA;
+  --bg-card-subtle: #F3EEFF;
   --bg-chat-ai: #FFFFFF;
-  --bg-chat-user: #7B4FF2;
-  --border-color: #E2E8F0;
-  --text-primary: #0F172A;
-  --text-secondary: #475569;
-  --text-muted: #64748B;
+  --bg-chat-user: linear-gradient(135deg, #7B4FF2 0%, #6366F1 100%);
+  --border-color: #E4DCF6;
+  --border-card: #E2D9F3;
+  --text-primary: #0F0C20;
+  --text-secondary: #4A4465;
+  --text-muted: #6B658B;
   --accent-violet: #6D28D9;
-  --accent-violet-bg: rgba(109, 40, 217, 0.08);
+  --accent-violet-bg: rgba(109, 40, 217, 0.09);
+  --accent-violet-border: rgba(109, 40, 217, 0.25);
   --accent-mint: #0D9488;
   --accent-mint-badge: #0F766E;
-  --accent-mint-bg: rgba(13, 148, 136, 0.1);
-  --card-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
-  --card-hover-border: rgba(109, 40, 217, 0.35);
+  --accent-mint-bg: rgba(13, 148, 136, 0.12);
+  --card-shadow: 0 4px 20px -2px rgba(109, 40, 217, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04);
+  --card-hover-shadow: 0 12px 30px -4px rgba(109, 40, 217, 0.16);
+  --card-hover-border: rgba(109, 40, 217, 0.4);
 }
 
 .dark {
   --bg-page: #12102B;
+  --bg-hero: radial-gradient(120% 120% at 50% 0%, rgba(123, 79, 242, 0.15) 0%, rgba(0, 229, 199, 0.08) 50%, #12102B 100%);
   --bg-header: rgba(18, 16, 43, 0.85);
   --bg-card: #1B173E;
-  --bg-card-subtle: #12102B;
+  --bg-card-subtle: #141133;
   --bg-chat-ai: #1B173E;
-  --bg-chat-user: #7B4FF2;
+  --bg-chat-user: linear-gradient(135deg, #7B4FF2 0%, #6366F1 100%);
   --border-color: #2E265C;
+  --border-card: #2E265C;
   --text-primary: #F1F0FB;
   --text-secondary: #9E9BB9;
   --text-muted: #737096;
   --accent-violet: #7B4FF2;
   --accent-violet-bg: rgba(123, 79, 242, 0.15);
+  --accent-violet-border: rgba(123, 79, 242, 0.35);
   --accent-mint: #00E5C7;
   --accent-mint-badge: #00E5C7;
   --accent-mint-bg: rgba(0, 229, 199, 0.1);
   --card-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+  --card-hover-shadow: 0 16px 36px -6px rgba(123, 79, 242, 0.3);
   --card-hover-border: rgba(123, 79, 242, 0.5);
 }
 

@@ -153,15 +153,11 @@ export default function Home() {
       <header className="border-b border-[var(--border-color)] bg-[var(--bg-header)] backdrop-blur-md sticky top-0 z-20 px-4 sm:px-6 py-4 transition-colors">
         <div className="max-w-5xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#7B4FF2] to-[#00E5C7] p-[1px] shadow-md">
-              <div className="w-full h-full bg-[var(--bg-card)] rounded-[11px] flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-[var(--accent-mint)]" />
-              </div>
-            </div>
+            <img src="/logo.svg" alt="AgentDAO Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-md shrink-0" />
             <div>
               <h1 className="font-bold text-xl tracking-tight text-[var(--text-primary)] flex items-center gap-2">
                 AgentDAO{" "}
-                <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent-violet-bg)] border border-[var(--accent-violet)]/30 text-[var(--accent-violet)] font-mono font-semibold">
+                <span className="text-xs px-2 py-0.5 rounded-full bg-[var(--accent-violet-bg)] border border-[var(--accent-violet-border)] text-[var(--accent-violet)] font-mono font-semibold">
                   v0.1
                 </span>
               </h1>
@@ -184,25 +180,25 @@ export default function Home() {
       </header>
 
       {/* HERO SECTION */}
-      <section className="relative overflow-hidden border-b border-[var(--border-color)] transition-colors">
+      <section className="relative overflow-hidden border-b border-[var(--border-color)] bg-[var(--bg-hero)] transition-colors">
         {/* Ambient glow orbs */}
-        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] bg-[#7B4FF2]/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-40 -right-40 w-[500px] h-[500px] bg-[#00E5C7]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-40 -left-40 w-[550px] h-[550px] bg-[#7B4FF2]/15 dark:bg-[#7B4FF2]/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-40 -right-40 w-[550px] h-[550px] bg-[#00E5C7]/15 dark:bg-[#00E5C7]/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative max-w-5xl mx-auto px-6 py-20 sm:py-28 text-center">
           {/* Eyebrow badge */}
-          <div className="inline-flex items-center gap-2 mb-6 px-3.5 py-1.5 rounded-full bg-[var(--accent-violet-bg)] border border-[var(--accent-violet)]/30 text-[var(--accent-violet)] text-xs font-mono tracking-wider uppercase font-semibold shadow-sm">
-            <Sparkles className="w-3.5 h-3.5" />
+          <div className="inline-flex items-center gap-2 mb-6 px-4 py-1.5 rounded-full bg-[var(--accent-violet-bg)] border border-[var(--accent-violet-border)] text-[var(--accent-violet)] text-xs font-mono tracking-wider uppercase font-bold shadow-sm">
+            <Sparkles className="w-3.5 h-3.5 text-[var(--accent-violet)]" />
             AI-Powered Governance on GIWA Sepolia
           </div>
 
           <h2 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-[var(--text-primary)] mb-4 leading-tight">
             AgentDAO
           </h2>
-          <p className="text-lg sm:text-xl font-semibold text-[var(--accent-mint)] mb-4">
+          <p className="text-lg sm:text-xl font-bold text-[var(--accent-mint)] mb-4">
             Run a DAO the way you'd run a group chat
           </p>
-          <p className="text-base sm:text-lg text-[var(--text-secondary)] max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg text-[var(--text-secondary)] font-medium max-w-2xl mx-auto mb-10 leading-relaxed">
             Describe your idea in plain language.
             <br className="hidden sm:block" />
             Get a clear, structured governance proposal in seconds, ready for onchain voting.
@@ -211,7 +207,7 @@ export default function Home() {
           <button
             id="hero-cta"
             onClick={scrollToChat}
-            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#7B4FF2] to-[#956BFB] hover:from-[#956BFB] hover:to-[#7B4FF2] text-white font-semibold px-8 py-3.5 rounded-2xl transition-all shadow-xl shadow-[#7B4FF2]/25 hover:shadow-[#7B4FF2]/40 hover:scale-105 active:scale-100 text-base cursor-pointer"
+            className="inline-flex items-center gap-2 bg-gradient-to-r from-[#7B4FF2] to-[#6366F1] hover:from-[#6366F1] hover:to-[#7B4FF2] text-white font-bold px-8 py-3.5 rounded-2xl transition-all shadow-xl shadow-[#7B4FF2]/25 hover:shadow-[#7B4FF2]/40 hover:scale-105 active:scale-100 text-base cursor-pointer"
           >
             Start generating
             <ArrowRight className="w-4 h-4" />

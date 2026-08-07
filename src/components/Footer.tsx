@@ -14,11 +14,7 @@ export function Footer() {
           {/* Brand Column */}
           <div className="md:col-span-1 space-y-4">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#7B4FF2] to-[#00E5C7] p-[1px] shadow-sm">
-                <div className="w-full h-full bg-[var(--bg-card)] rounded-[7px] flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-[var(--accent-mint)]" />
-                </div>
-              </div>
+              <img src="/logo.svg" alt="AgentDAO Logo" className="w-8 h-8 rounded-lg shadow-sm" />
               <span className="font-bold text-lg text-[var(--text-primary)] tracking-tight">
                 AgentDAO
               </span>
