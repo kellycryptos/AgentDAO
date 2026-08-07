@@ -23,6 +23,21 @@ const config: HardhatUserConfig = {
       accounts: [PRIVATE_KEY],
     },
   },
+  etherscan: {
+    apiKey: {
+      giwaSepolia: "empty",
+    },
+    customChains: [
+      {
+        network: "giwaSepolia",
+        chainId: 91342,
+        urls: {
+          apiURL: "https://sepolia-explorer.giwa.io/api",
+          browserURL: "https://sepolia-explorer.giwa.io",
+        },
+      },
+    ],
+  },
 };
 
 export default config;
