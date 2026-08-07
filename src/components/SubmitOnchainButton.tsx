@@ -12,6 +12,18 @@ interface SubmitOnchainButtonProps {
   amount: string;
 }
 
+function parseFriendlyError(error: any): string {
+  if (!error) return "An unexpected transaction error occurred.";
+  const msg = typeof error === "string" ? error : error?.shortMessage || error?.message || String(error);
+  if (msg.includes("User rejected") || msg.includes("user rejected") || msg.includes("User denied")) {
+    return "Transaction request was cancelled in your wallet.";
+  }
+  if (msg.includes("insufficient funds")) {
+    return "Insufficient testnet ETH for gas fees on GIWA Sepolia.";
+  }
+  return error?.shortMessage || "Transaction failed on GIWA Sepolia. Please try again.";
+}
+
 export function SubmitOnchainButton({ title, summary, amount }: SubmitOnchainButtonProps) {
   const { isConnected } = useAccount();
   const chainId = useChainId();
@@ -43,7 +55,7 @@ export function SubmitOnchainButton({ title, summary, amount }: SubmitOnchainBut
         args: [title, summary, parsedAmount],
       });
     } catch (err: any) {
-      setLocalError(err?.shortMessage || err?.message || "Transaction rejected or failed");
+      setLocalError(parseFriendlyError(err));
     }
   };
 
@@ -91,7 +103,7 @@ export function SubmitOnchainButton({ title, summary, amount }: SubmitOnchainBut
       {(writeError || localError) && (
         <div className="text-xs text-red-300 bg-red-950/40 p-3 rounded-xl border border-red-500/30 flex items-center gap-2">
           <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
-          <span>{localError || writeError?.message}</span>
+          <span>{localError || parseFriendlyError(writeError)}</span>
         </div>
       )}
 

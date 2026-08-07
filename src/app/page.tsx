@@ -122,15 +122,18 @@ export default function Home() {
         )
       );
     } catch (err: any) {
+      const friendlyError =
+        err?.message?.includes("HTTP") || err?.message?.includes("fetch")
+          ? "Unable to reach the AI drafting service right now. Please try again in a moment."
+          : err?.message || "An unexpected error occurred while drafting the proposal.";
+
       setMessages((prev) =>
         prev.map((msg) =>
           msg.id === aiMsgId
             ? {
                 ...msg,
                 isLoading: false,
-                error:
-                  err?.message ||
-                  "An unexpected error occurred while drafting the proposal.",
+                error: friendlyError,
               }
             : msg
         )

@@ -14,8 +14,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AgentDAO - AI Governance Assistant",
-  description: "AI assistant for everyday communities to draft and manage DAO proposals with GIWA Sepolia onchain voting.",
+  title: "AgentDAO | AI Governance Assistant on GIWA Sepolia",
+  description: "AI assistant for everyday communities to draft proposals, summarize discussions, and vote onchain on GIWA Sepolia testnet.",
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
