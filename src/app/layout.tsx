@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://agent-dao-gilt.vercel.app"),
   title: "AgentDAO | AI Governance Assistant on GIWA Sepolia",
   description: "AI assistant for everyday communities to draft proposals, summarize discussions, and vote onchain on GIWA Sepolia testnet.",
   icons: {
