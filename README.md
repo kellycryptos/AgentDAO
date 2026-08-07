@@ -40,6 +40,7 @@ Running a DAO is still too hard for everyday groups. Wallets, gas, and governanc
 |---|---|---|
 | 💬 **Natural language interface** | **Live** | Create groups, ask questions, and draft governance ideas in plain text |
 | ✍️ **AI proposal writer** | **Live** | Converts plain language into structured, votable proposal drafts via Groq AI (Llama 3.3 70B) |
+| 📝 **Discussion Summarizer** | **Live** | Paste Discord/Telegram threads to extract core decisions, pros/cons, consensus, and pre-fill proposal drafts |
 | 🔗 **Reown AppKit Wallet Connection** | **Live** | Web3 wallet connection configured specifically for GIWA Sepolia custom chain |
 | 🗳️ **GIWA Sepolia Onchain Voting** | **Live** | Register AI proposal drafts onchain and cast Yes/No votes on contract [`0xcCe989122524D99D05C9EE871505c11bE935deCb`](https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb) |
 | 💰 **Agent Treasury** | *Planned (Q4 2026)* | AI-assisted fund management against member-set rules |
