@@ -138,33 +138,33 @@ export function RatificationStrip() {
               </p>
             </div>
 
-            {/* Field 3: Amount */}
+            {/* Field 3: Amount + Ratified Stamp (inline, no absolute positioning) */}
             <div
               className={`flex items-center justify-between pt-1 border-t border-dashed border-[var(--border-color)] transition-all duration-300 ${
                 fieldStep >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
               }`}
             >
-              <div className="flex items-center gap-2 max-w-[60%] shrink-0">
+              <div className="flex items-center gap-2 shrink-0">
                 <span className="text-xs font-serif-headline font-bold text-[var(--text-muted)] shrink-0">
                   Grant Requested:
                 </span>
-                <span className="text-xs sm:text-sm font-bold font-receipt-mono text-[var(--accent-violet)] bg-[var(--accent-violet-bg)] px-2.5 py-1 rounded border border-[var(--accent-violet-border)] truncate">
+                <span className="text-xs sm:text-sm font-bold font-receipt-mono text-[var(--accent-violet)] bg-[var(--accent-violet-bg)] px-2.5 py-1 rounded border border-[var(--accent-violet-border)]">
                   2,000 USDC
                 </span>
               </div>
-            </div>
 
-            {/* Ratified Stamp */}
-            {stage === "stamped" && (
-              <div className="absolute right-3 top-3 sm:right-5 sm:top-4 pointer-events-none z-10 animate-stamp">
-                <div className="border-2 sm:border-3 border-[#00D9B5] rounded-xl px-2.5 py-0.5 sm:px-3 sm:py-1 transform -rotate-6 bg-[#00D9B5]/15 backdrop-blur-[1px] shadow-lg shadow-[#00D9B5]/20 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00D9B5]" />
-                  <span className="text-xs sm:text-sm font-black font-receipt-mono tracking-widest text-[#00D9B5] uppercase">
-                    RATIFIED
-                  </span>
+              {/* Ratified Stamp — flows inline to the right of the amount, zero overlap risk */}
+              {stage === "stamped" && (
+                <div className="pointer-events-none animate-stamp shrink-0">
+                  <div className="border-2 border-[#00D9B5] rounded-lg px-2 py-0.5 transform -rotate-6 bg-[#00D9B5]/15 shadow-md shadow-[#00D9B5]/20 flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#00D9B5] shrink-0" />
+                    <span className="text-[10px] sm:text-xs font-black font-receipt-mono tracking-widest text-[#00D9B5] uppercase whitespace-nowrap">
+                      RATIFIED
+                    </span>
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
 
             {/* Verified Onchain Tx Hash Footer */}
             <div
