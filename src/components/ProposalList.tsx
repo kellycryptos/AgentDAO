@@ -9,6 +9,7 @@ import {
   useWaitForTransactionReceipt,
 } from "wagmi";
 import { PROPOSAL_REGISTRY_ADDRESS, PROPOSAL_REGISTRY_ABI } from "@/lib/abi";
+import { AddMemberPanel } from "@/components/AddMemberPanel";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -22,16 +23,24 @@ import {
   Vote,
   Sparkles,
   RefreshCw,
+  Users,
+  Shield,
+  Lock,
+  Unlock,
+  Plus,
+  UserCheck,
+  Eye,
 } from "lucide-react";
 
 interface ProposalItemProps {
   id: bigint;
+  selectedGroupId?: bigint;
 }
 
 function parseFriendlyError(error: any): string {
   if (!error) return "An unexpected transaction error occurred.";
-  const msg = error?.shortMessage || error?.message || String(error);
-  if (msg.includes("User rejected") || msg.includes("user rejected")) {
+  const msg = typeof error === "string" ? error : error?.shortMessage || error?.message || String(error);
+  if (msg.includes("User rejected") || msg.includes("user rejected") || msg.includes("User denied")) {
     return "Transaction request was cancelled in your wallet.";
   }
   if (msg.includes("insufficient funds")) {
@@ -40,10 +49,13 @@ function parseFriendlyError(error: any): string {
   if (msg.includes("AlreadyVoted")) {
     return "You have already voted on this proposal.";
   }
+  if (msg.includes("NotGroupMember")) {
+    return "You are not a member of this group. Join the group to vote!";
+  }
   if (msg.includes("ProposalDoesNotExist")) {
     return "This proposal ID does not exist onchain.";
   }
-  return msg;
+  return error?.shortMessage || "Transaction failed. Please try again.";
 }
 
 const THRESHOLD = BigInt("1000000000000000");
@@ -57,17 +69,35 @@ const formatAmountDisplay = (rawAmount: bigint): string => {
   return `${Number(rawAmount).toLocaleString()} USDC`;
 };
 
-function ProposalItem({ id }: ProposalItemProps) {
+function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
   const { address, isConnected } = useAccount();
   const chainId = useChainId();
   const isCorrectNetwork = chainId === 91342;
 
-  const { data: proposal, refetch } = useReadContract({
+  const { data: proposal, refetch: refetchProposal } = useReadContract({
     address: PROPOSAL_REGISTRY_ADDRESS,
     abi: PROPOSAL_REGISTRY_ABI,
     functionName: "getProposal",
     args: [id],
     query: { refetchInterval: 4000 },
+  });
+
+  const groupId = proposal?.groupId ?? 0n;
+
+  const { data: group } = useReadContract({
+    address: PROPOSAL_REGISTRY_ADDRESS,
+    abi: PROPOSAL_REGISTRY_ABI,
+    functionName: "getGroup",
+    args: [groupId],
+    query: { refetchInterval: 4000 },
+  });
+
+  const { data: isMember, refetch: refetchIsMember } = useReadContract({
+    address: PROPOSAL_REGISTRY_ADDRESS,
+    abi: PROPOSAL_REGISTRY_ABI,
+    functionName: "isMember",
+    args: address ? [groupId, address] : undefined,
+    query: { enabled: !!address, refetchInterval: 4000 },
   });
 
   const { data: hasVotedUser } = useReadContract({
@@ -79,10 +109,7 @@ function ProposalItem({ id }: ProposalItemProps) {
   });
 
   const { data: hash, isPending: isWritePending, error: writeError, writeContractAsync } = useWriteContract();
-
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
-    hash,
-  });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash });
 
   const [voteType, setVoteType] = useState<boolean | null>(null);
   const [isFinalizingAction, setIsFinalizingAction] = useState(false);
@@ -99,7 +126,7 @@ function ProposalItem({ id }: ProposalItemProps) {
         functionName: "vote",
         args: [id, support],
       });
-      refetch();
+      refetchProposal();
     } catch (err: any) {
       setLocalError(parseFriendlyError(err));
     }
@@ -115,7 +142,22 @@ function ProposalItem({ id }: ProposalItemProps) {
         functionName: "finalizeProposal",
         args: [id],
       });
-      refetch();
+      refetchProposal();
+    } catch (err: any) {
+      setLocalError(parseFriendlyError(err));
+    }
+  };
+
+  const handleJoinGroup = async () => {
+    setLocalError(null);
+    try {
+      await writeContractAsync({
+        address: PROPOSAL_REGISTRY_ADDRESS,
+        abi: PROPOSAL_REGISTRY_ABI,
+        functionName: "joinGroup",
+        args: [groupId],
+      });
+      refetchIsMember();
     } catch (err: any) {
       setLocalError(parseFriendlyError(err));
     }
@@ -134,6 +176,11 @@ function ProposalItem({ id }: ProposalItemProps) {
     );
   }
 
+  // Filter out if selectedGroupId is specified and doesn't match
+  if (selectedGroupId !== undefined && proposal.groupId !== selectedGroupId) {
+    return null;
+  }
+
   const { title, summary, amount, proposer, yesVotes, noVotes, createdAt, deadline, finalized } = proposal;
   const formattedAmount = formatAmountDisplay(amount);
   const formattedDate = new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
@@ -147,7 +194,12 @@ function ProposalItem({ id }: ProposalItemProps) {
   const nowSec = Math.floor(Date.now() / 1000);
   const deadlineNum = Number(deadline || BigInt(0));
   const isExpired = deadlineNum > 0 && nowSec >= deadlineNum;
-  const isPassed = yesVotes > noVotes;
+
+  const thresholdBps = group ? Number(group.approvalThresholdBps) : 5100;
+  const totalVotes = yesVotes + noVotes;
+  const isPassed = totalVotes > 0n && (yesVotes * 10000n) >= (totalVotes * BigInt(thresholdBps));
+
+  const isAdmin = address && group && group.admin.toLowerCase() === address.toLowerCase();
 
   const getTimeRemainingText = () => {
     if (!deadlineNum) return "No Deadline";
@@ -173,11 +225,32 @@ function ProposalItem({ id }: ProposalItemProps) {
               Proposal #{id.toString()}
             </span>
 
+            {/* Group Tag */}
+            <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[var(--bg-card-subtle)] text-[var(--text-secondary)] border border-[var(--border-color)] font-medium flex items-center gap-1">
+              <Users className="w-3 h-3 text-[var(--accent-violet)]" />
+              {group ? group.name : `Group #${groupId.toString()}`}
+            </span>
+
+            {/* User Role Badge */}
+            {isAdmin ? (
+              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-extrabold flex items-center gap-1">
+                <Shield className="w-3 h-3 text-amber-500" /> Admin
+              </span>
+            ) : isMember ? (
+              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[var(--accent-mint-bg)] text-[var(--accent-mint)] border border-[var(--accent-mint)]/30 font-bold flex items-center gap-1">
+                <UserCheck className="w-3 h-3 text-[var(--accent-mint)]" /> Member
+              </span>
+            ) : (
+              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/30 font-medium flex items-center gap-1">
+                <Eye className="w-3 h-3" /> Guest (Read-Only)
+              </span>
+            )}
+
             {/* Status Badges */}
             {finalized ? (
               isPassed ? (
                 <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-extrabold flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-500" /> PASSED
+                  <CheckCircle2 className="w-3 h-3 text-emerald-500" /> PASSED ({(thresholdBps / 100).toFixed(0)}% THRESHOLD MET)
                 </span>
               ) : (
                 <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-extrabold flex items-center gap-1">
@@ -193,10 +266,6 @@ function ProposalItem({ id }: ProposalItemProps) {
                 <Clock className="w-3 h-3 text-[var(--accent-mint)]" /> {getTimeRemainingText()}
               </span>
             )}
-
-            <span className="text-xs text-[var(--text-muted)] font-mono flex items-center gap-1">
-              {formattedDate}
-            </span>
           </div>
           <h3 className="font-bold text-base sm:text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-violet)] transition-colors">{title}</h3>
         </div>
@@ -230,7 +299,15 @@ function ProposalItem({ id }: ProposalItemProps) {
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
+        <div className="text-[11px] font-mono text-[var(--text-muted)]">
+          Approval Threshold: <strong className="text-[var(--text-primary)] font-bold">{(thresholdBps / 100).toFixed(1)}%</strong>
+        </div>
       </div>
+
+      {/* Admin Panel for Invite-Only Groups */}
+      {isAdmin && group && !group.isOpen && (
+        <AddMemberPanel groupId={groupId} groupName={group.name} onMemberAdded={refetchIsMember} />
+      )}
 
       {/* Voting Tally & Action Buttons */}
       <div className="pt-2 border-t border-[var(--border-color)] space-y-3">
@@ -245,7 +322,7 @@ function ProposalItem({ id }: ProposalItemProps) {
           </div>
         </div>
 
-        {/* Voting / Finalize Action Section */}
+        {/* Voting / Finalize / Guest Action Section */}
         {finalized ? (
           <div className={`text-xs p-3 rounded-xl border text-center font-bold flex items-center justify-center gap-2 ${
             isPassed
@@ -253,7 +330,7 @@ function ProposalItem({ id }: ProposalItemProps) {
               : "bg-rose-500/10 text-rose-600 dark:text-rose-300 border-rose-500/30"
           }`}>
             {isPassed ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <AlertCircle className="w-4 h-4 text-rose-500" />}
-            <span>Proposal Ratification Complete — Status: {isPassed ? "PASSED" : "REJECTED"}</span>
+            <span>Proposal Finalized — Outcome: {isPassed ? `PASSED (${(thresholdBps / 100).toFixed(0)}% THRESHOLD MET)` : "REJECTED"}</span>
           </div>
         ) : isExpired ? (
           <button
@@ -275,12 +352,44 @@ function ProposalItem({ id }: ProposalItemProps) {
             )}
           </button>
         ) : !isConnected ? (
-          <div className="text-xs text-[var(--text-muted)] text-center italic py-2 bg-[var(--bg-card-subtle)] rounded-xl border border-[var(--border-color)]">
-            Connect wallet on GIWA Sepolia to cast your vote.
+          <div className="text-xs text-[var(--text-muted)] text-center italic py-2.5 bg-[var(--bg-card-subtle)] rounded-xl border border-[var(--border-color)]">
+            Connect wallet on GIWA Sepolia to vote.
           </div>
         ) : !isCorrectNetwork ? (
-          <div className="text-xs text-amber-600 dark:text-amber-300 text-center py-2 bg-amber-500/10 rounded-xl border border-amber-500/30 font-medium">
+          <div className="text-xs text-amber-600 dark:text-amber-300 text-center py-2.5 bg-amber-500/10 rounded-xl border border-amber-500/30 font-medium">
             Switch network to GIWA Sepolia to vote.
+          </div>
+        ) : !isMember && !isAdmin ? (
+          /* GUEST STATE — Clear Membership Block Prompt */
+          <div className="bg-[var(--accent-violet-bg)] border border-[var(--accent-violet-border)] p-3.5 rounded-xl text-center space-y-2">
+            <div className="text-xs font-semibold text-[var(--text-primary)] flex items-center justify-center gap-1.5">
+              <Eye className="w-4 h-4 text-[var(--accent-violet)]" />
+              <span>You are viewing as a Guest. Join this group to participate in voting.</span>
+            </div>
+            {group?.isOpen ? (
+              <button
+                type="button"
+                onClick={handleJoinGroup}
+                disabled={isWritePending || isConfirming}
+                className="inline-flex items-center gap-1.5 bg-[#00E5C7] hover:bg-[#00C4AA] text-slate-950 font-bold text-xs px-5 py-2 rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
+              >
+                {isWritePending && !isFinalizingAction ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Joining Group...</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Join Group to Vote</span>
+                  </>
+                )}
+              </button>
+            ) : (
+              <p className="text-[11px] text-[var(--text-muted)] italic">
+                This is an invite-only group. Contact the Group Admin ({group?.admin.slice(0, 6)}...{group?.admin.slice(-4)}) to request access.
+              </p>
+            )}
           </div>
         ) : hasVotedUser ? (
           <div className="text-xs text-[var(--accent-mint)] bg-[var(--accent-mint-bg)] border border-[var(--accent-mint)]/30 p-2.5 rounded-xl text-center font-medium flex items-center justify-center gap-1.5">
@@ -329,7 +438,7 @@ function ProposalItem({ id }: ProposalItemProps) {
         {isConfirmed && hash && (
           <div className="text-xs text-[var(--accent-mint)] bg-[var(--accent-mint-bg)] p-2.5 rounded-xl flex items-center justify-between flex-wrap gap-2 border border-[var(--accent-mint)]/30 font-medium">
             <span className="flex items-center gap-1.5 font-medium">
-              <CheckCircle2 className="w-4 h-4" /> {isFinalizingAction ? "Proposal Finalized Onchain!" : "Vote Recorded Onchain!"}
+              <CheckCircle2 className="w-4 h-4" /> {isFinalizingAction ? "Proposal Finalized Onchain!" : "Action Recorded Onchain!"}
             </span>
             <a
               href={`https://sepolia-explorer.giwa.io/tx/${hash}`}
@@ -346,7 +455,11 @@ function ProposalItem({ id }: ProposalItemProps) {
   );
 }
 
-export function ProposalList() {
+interface ProposalListProps {
+  selectedGroupId?: bigint;
+}
+
+export function ProposalList({ selectedGroupId }: ProposalListProps) {
   const { data: count, isLoading, isError, refetch } = useReadContract({
     address: PROPOSAL_REGISTRY_ADDRESS,
     abi: PROPOSAL_REGISTRY_ABI,
@@ -428,7 +541,7 @@ export function ProposalList() {
         ) : (
           <div className="space-y-6">
             {proposalIds.map((id) => (
-              <ProposalItem key={id.toString()} id={id} />
+              <ProposalItem key={id.toString()} id={id} selectedGroupId={selectedGroupId} />
             ))}
           </div>
         )}
@@ -436,3 +549,4 @@ export function ProposalList() {
     </section>
   );
 }
+

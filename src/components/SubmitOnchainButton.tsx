@@ -6,6 +6,7 @@ import { PROPOSAL_REGISTRY_ADDRESS, PROPOSAL_REGISTRY_ABI } from "@/lib/abi";
 import { ExternalLink, Loader2, Send, CheckCircle2, AlertCircle, Sparkles, ArrowUpRight } from "lucide-react";
 
 interface SubmitOnchainButtonProps {
+  groupId?: bigint;
   title: string;
   summary: string;
   amount: string;
@@ -20,10 +21,13 @@ function parseFriendlyError(error: any): string {
   if (msg.includes("insufficient funds")) {
     return "Insufficient testnet ETH for gas fees on GIWA Sepolia.";
   }
+  if (msg.includes("NotGroupMember")) {
+    return "You must be a member of this group to submit proposals onchain.";
+  }
   return error?.shortMessage || "Transaction failed on GIWA Sepolia. Please try again.";
 }
 
-export function SubmitOnchainButton({ title, summary, amount }: SubmitOnchainButtonProps) {
+export function SubmitOnchainButton({ groupId = 0n, title, summary, amount }: SubmitOnchainButtonProps) {
   const { isConnected } = useAccount();
   const chainId = useChainId();
   const isCorrectNetwork = chainId === 91342;
@@ -51,7 +55,7 @@ export function SubmitOnchainButton({ title, summary, amount }: SubmitOnchainBut
         address: PROPOSAL_REGISTRY_ADDRESS,
         abi: PROPOSAL_REGISTRY_ABI,
         functionName: "createProposal",
-        args: [title, summary, parsedAmount, BigInt(604800)],
+        args: [groupId, title, summary, parsedAmount, BigInt(604800)],
       });
     } catch (err: any) {
       setLocalError(parseFriendlyError(err));

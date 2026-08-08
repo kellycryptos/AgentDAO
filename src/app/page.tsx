@@ -26,6 +26,7 @@ import { ProposalList } from "@/components/ProposalList";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Footer } from "@/components/Footer";
 import { RatificationStrip } from "@/components/RatificationStrip";
+import { GroupSelector } from "@/components/GroupSelector";
 import { PROPOSAL_REGISTRY_ADDRESS } from "@/lib/abi";
 
 interface ProposalData {
@@ -90,6 +91,7 @@ export default function Home() {
   ]);
   const [inputPrompt, setInputPrompt] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState<bigint>(0n);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatSectionRef = useRef<HTMLDivElement>(null);
   const summarizerSectionRef = useRef<HTMLDivElement>(null);
@@ -262,6 +264,7 @@ export default function Home() {
                 <span>Discussion Summarizer</span>
               </button>
             </div>
+            <GroupSelector selectedGroupId={selectedGroupId} onSelectGroup={setSelectedGroupId} />
             <ThemeToggle />
             <ConnectButton />
           </div>
@@ -663,6 +666,7 @@ export default function Home() {
 
                         {/* Onchain Submission Layer */}
                         <SubmitOnchainButton
+                          groupId={selectedGroupId}
                           title={msg.proposal.title}
                           summary={msg.proposal.summary}
                           amount={msg.proposal.amount}
@@ -874,7 +878,7 @@ export default function Home() {
       )}
 
       {/* ONCHAIN PROPOSALS LIST */}
-      <ProposalList />
+      <ProposalList selectedGroupId={selectedGroupId} />
 
       {/* FOOTER */}
       <Footer />

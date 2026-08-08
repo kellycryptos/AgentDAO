@@ -1,12 +1,53 @@
 export const PROPOSAL_REGISTRY_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  "0x92a76b5CCCfBB56106bE22d15558009376496Ff5") as `0x${string}`;
+  "0x4ECedc29B2A8E9f9f46221e76Cee7cEDe4eB613e") as `0x${string}`;
 
 export const PROPOSAL_REGISTRY_ABI = [
+  {
+    type: "function",
+    name: "createGroup",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "name", type: "string" },
+      { name: "description", type: "string" },
+      { name: "isOpen", type: "bool" },
+      { name: "approvalThresholdBps", type: "uint256" },
+      { name: "defaultVotingPeriod", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "joinGroup",
+    stateMutability: "nonpayable",
+    inputs: [{ name: "groupId", type: "uint256" }],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "addMember",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "groupId", type: "uint256" },
+      { name: "member", type: "address" },
+    ],
+    outputs: [],
+  },
+  {
+    type: "function",
+    name: "removeMember",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "groupId", type: "uint256" },
+      { name: "member", type: "address" },
+    ],
+    outputs: [],
+  },
   {
     type: "function",
     name: "createProposal",
     stateMutability: "nonpayable",
     inputs: [
+      { name: "groupId", type: "uint256" },
       { name: "title", type: "string" },
       { name: "summary", type: "string" },
       { name: "amount", type: "uint256" },
@@ -33,6 +74,43 @@ export const PROPOSAL_REGISTRY_ABI = [
   },
   {
     type: "function",
+    name: "getGroup",
+    stateMutability: "view",
+    inputs: [{ name: "groupId", type: "uint256" }],
+    outputs: [
+      {
+        type: "tuple",
+        components: [
+          { name: "name", type: "string" },
+          { name: "description", type: "string" },
+          { name: "admin", type: "address" },
+          { name: "isOpen", type: "bool" },
+          { name: "approvalThresholdBps", type: "uint256" },
+          { name: "defaultVotingPeriod", type: "uint256" },
+          { name: "memberCount", type: "uint256" },
+        ],
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "groupCount",
+    stateMutability: "view",
+    inputs: [],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "isMember",
+    stateMutability: "view",
+    inputs: [
+      { name: "groupId", type: "uint256" },
+      { name: "account", type: "address" },
+    ],
+    outputs: [{ name: "", type: "bool" }],
+  },
+  {
+    type: "function",
     name: "getProposal",
     stateMutability: "view",
     inputs: [{ name: "proposalId", type: "uint256" }],
@@ -40,6 +118,7 @@ export const PROPOSAL_REGISTRY_ABI = [
       {
         type: "tuple",
         components: [
+          { name: "groupId", type: "uint256" },
           { name: "title", type: "string" },
           { name: "summary", type: "string" },
           { name: "amount", type: "uint256" },
@@ -72,9 +151,46 @@ export const PROPOSAL_REGISTRY_ABI = [
   },
   {
     type: "event",
+    name: "GroupCreated",
+    inputs: [
+      { name: "groupId", type: "uint256", indexed: true },
+      { name: "name", type: "string", indexed: false },
+      { name: "admin", type: "address", indexed: true },
+      { name: "isOpen", type: "bool", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "MemberJoined",
+    inputs: [
+      { name: "groupId", type: "uint256", indexed: true },
+      { name: "member", type: "address", indexed: true },
+    ],
+  },
+  {
+    type: "event",
+    name: "MemberAdded",
+    inputs: [
+      { name: "groupId", type: "uint256", indexed: true },
+      { name: "member", type: "address", indexed: true },
+      { name: "addedBy", type: "address", indexed: true },
+    ],
+  },
+  {
+    type: "event",
+    name: "MemberRemoved",
+    inputs: [
+      { name: "groupId", type: "uint256", indexed: true },
+      { name: "member", type: "address", indexed: true },
+      { name: "removedBy", type: "address", indexed: true },
+    ],
+  },
+  {
+    type: "event",
     name: "ProposalCreated",
     inputs: [
       { name: "id", type: "uint256", indexed: true },
+      { name: "groupId", type: "uint256", indexed: true },
       { name: "proposer", type: "address", indexed: true },
       { name: "deadline", type: "uint256", indexed: false },
     ],
@@ -95,6 +211,50 @@ export const PROPOSAL_REGISTRY_ABI = [
       { name: "id", type: "uint256", indexed: true },
       { name: "passed", type: "bool", indexed: false },
     ],
+  },
+  {
+    type: "error",
+    name: "GroupDoesNotExist",
+    inputs: [{ name: "groupId", type: "uint256" }],
+  },
+  {
+    type: "error",
+    name: "GroupNotOpen",
+    inputs: [{ name: "groupId", type: "uint256" }],
+  },
+  {
+    type: "error",
+    name: "AlreadyMember",
+    inputs: [
+      { name: "groupId", type: "uint256" },
+      { name: "account", type: "address" },
+    ],
+  },
+  {
+    type: "error",
+    name: "NotGroupMember",
+    inputs: [
+      { name: "groupId", type: "uint256" },
+      { name: "account", type: "address" },
+    ],
+  },
+  {
+    type: "error",
+    name: "NotGroupAdmin",
+    inputs: [
+      { name: "groupId", type: "uint256" },
+      { name: "account", type: "address" },
+    ],
+  },
+  {
+    type: "error",
+    name: "CannotRemoveAdmin",
+    inputs: [{ name: "groupId", type: "uint256" }],
+  },
+  {
+    type: "error",
+    name: "InvalidThresholdBps",
+    inputs: [{ name: "bps", type: "uint256" }],
   },
   {
     type: "error",
@@ -125,3 +285,4 @@ export const PROPOSAL_REGISTRY_ABI = [
     inputs: [{ name: "proposalId", type: "uint256" }],
   },
 ] as const;
+

@@ -25,14 +25,15 @@ Running a DAO is still too hard for everyday groups. Wallets, gas, and governanc
 
 ## Status
 
-> **Live MVP on GIWA Sepolia.** The app features an end-to-end AI proposal generator, Reown AppKit wallet connection, and live onchain proposal registration & voting on GIWA Sepolia testnet.
+> **Live MVP on GIWA Sepolia.** The app features an end-to-end AI proposal generator, Reown AppKit wallet connection, onchain group management with custom approval thresholds, and member-scoped proposal voting on GIWA Sepolia testnet.
 
 ## Deployed Smart Contract
 
 - **Network:** GIWA Sepolia (Chain ID: `91342`)
 - **Contract Name:** `ProposalRegistry`
-- **Verified Contract Address:** [`0x92a76b5CCCfBB56106bE22d15558009376496Ff5`](https://sepolia-explorer.giwa.io/address/0x92a76b5CCCfBB56106bE22d15558009376496Ff5#code)
-- **Explorer:** [GIWA Sepolia Blockscout Explorer](https://sepolia-explorer.giwa.io/address/0x92a76b5CCCfBB56106bE22d15558009376496Ff5#code)
+- **Verified Contract Address:** [`0x4ECedc29B2A8E9f9f46221e76Cee7cEDe4eB613e`](https://sepolia-explorer.giwa.io/address/0x4ECedc29B2A8E9f9f46221e76Cee7cEDe4eB613e#code)
+- **Explorer:** [GIWA Sepolia Blockscout Explorer](https://sepolia-explorer.giwa.io/address/0x4ECedc29B2A8E9f9f46221e76Cee7cEDe4eB613e#code)
+- **Seeded Demo Group:** Group #0 (`Public Demo Group`, Open membership, 51.00% threshold, 7-day voting period)
 
 ## Features
 
@@ -40,9 +41,10 @@ Running a DAO is still too hard for everyday groups. Wallets, gas, and governanc
 |---|---|---|
 | 💬 **Natural language interface** | **Live** | Create groups, ask questions, and draft governance ideas in plain text |
 | ✍️ **AI proposal writer** | **Live** | Converts plain language into structured, votable proposal drafts via Groq AI (Llama 3.3 70B) |
+| 👥 **Onchain Group Management & Access Control** | **Live** | Create open or invite-only DAOs with custom approval thresholds, admin panels, and member allowlists |
 | 📝 **Discussion Summarizer** | **Live** | Paste Discord/Telegram threads to extract core decisions, pros/cons, consensus, and pre-fill proposal drafts |
 | 🔗 **Reown AppKit Wallet Connection** | **Live** | Web3 wallet connection configured specifically for GIWA Sepolia custom chain |
-| 🗳️ **GIWA Sepolia Onchain Voting & Deadlines** | **Live** | Register AI proposal drafts onchain with a 7-day voting window, cast Yes/No votes, and execute finalization on contract [`0x92a76b5CCCfBB56106bE22d15558009376496Ff5`](https://sepolia-explorer.giwa.io/address/0x92a76b5CCCfBB56106bE22d15558009376496Ff5#code) |
+| 🗳️ **Group-Scoped Onchain Voting & Finalization** | **Live** | Register proposals under specific groups, enforce member voting rights, and finalize proposals against BPS thresholds on contract [`0x4ECedc29B2A8E9f9f46221e76Cee7cEDe4eB613e`](https://sepolia-explorer.giwa.io/address/0x4ECedc29B2A8E9f9f46221e76Cee7cEDe4eB613e#code) |
 | 💰 **Agent Treasury** | *Planned (Q4 2026)* | AI-assisted fund management against member-set rules |
 
 ## Live Demo
