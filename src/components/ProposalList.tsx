@@ -159,6 +159,21 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
     }
   };
 
+  const handleJoinGroup = async () => {
+    setLocalError(null);
+    try {
+      await writeContractAsync({
+        address: PROPOSAL_REGISTRY_ADDRESS,
+        abi: PROPOSAL_REGISTRY_ABI,
+        functionName: "joinGroup",
+        args: [groupId],
+      });
+      refetchIsMember();
+    } catch (err: any) {
+      setLocalError(parseFriendlyError(err));
+    }
+  };
+
   if (!proposal) {
     return (
       <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6 space-y-3 animate-pulse">

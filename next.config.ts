@@ -3,7 +3,15 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   turbopack: {},
   webpack: (config, { webpack }) => {
-    config.externals.push("pino-pretty", "lokijs", "encoding", "@coinbase/cdp-sdk");
+    config.externals.push(
+      "pino-pretty",
+      "lokijs",
+      "encoding",
+      "@coinbase/cdp-sdk",
+      "@metamask/connect-evm",
+      "porto",
+      "@walletconnect/ethereum-provider"
+    );
     config.plugins.push(
       new webpack.NormalModuleReplacementPlugin(
         /^@phosphor-icons\/webcomponents\/(.*)$/,
@@ -23,6 +31,9 @@ const nextConfig: NextConfig = {
       crypto: false,
       "@coinbase/cdp-sdk": false,
       accounts: false,
+      "@metamask/connect-evm": false,
+      porto: false,
+      "@walletconnect/ethereum-provider": false,
     };
     return config;
   },
