@@ -156,10 +156,10 @@ export function RatificationStrip() {
 
             {/* Ratified Stamp */}
             {stage === "stamped" && (
-              <div className="absolute right-3 bottom-[2.85rem] sm:right-5 sm:bottom-[3.1rem] pointer-events-none z-10 animate-stamp">
-                <div className="border-3 sm:border-4 border-[#00D9B5] rounded-xl px-3 py-1 sm:px-4 sm:py-1.5 transform -rotate-6 bg-[#00D9B5]/10 backdrop-blur-[1px] shadow-lg shadow-[#00D9B5]/20 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#00D9B5]" />
-                  <span className="text-base sm:text-xl font-black font-receipt-mono tracking-widest text-[#00D9B5] uppercase">
+              <div className="absolute right-3 top-3 sm:right-5 sm:top-4 pointer-events-none z-10 animate-stamp">
+                <div className="border-2 sm:border-3 border-[#00D9B5] rounded-xl px-2.5 py-0.5 sm:px-3 sm:py-1 transform -rotate-6 bg-[#00D9B5]/15 backdrop-blur-[1px] shadow-lg shadow-[#00D9B5]/20 flex items-center gap-1">
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00D9B5]" />
+                  <span className="text-xs sm:text-sm font-black font-receipt-mono tracking-widest text-[#00D9B5] uppercase">
                     RATIFIED
                   </span>
                 </div>
