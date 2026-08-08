@@ -91,7 +91,7 @@ export default function Home() {
   ]);
   const [inputPrompt, setInputPrompt] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedGroupId, setSelectedGroupId] = useState<bigint>(0n);
+  const [selectedGroupId, setSelectedGroupId] = useState<bigint>(BigInt(0));
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatSectionRef = useRef<HTMLDivElement>(null);
   const summarizerSectionRef = useRef<HTMLDivElement>(null);

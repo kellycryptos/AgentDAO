@@ -173,7 +173,7 @@ export function GroupSelector({ selectedGroupId, onSelectGroup }: GroupSelectorP
     args: [selectedGroupId],
   });
 
-  const count = Number(groupCount || 0n);
+  const count = Number(groupCount || BigInt(0));
   const groupIds = Array.from({ length: count }, (_, i) => BigInt(i));
 
   return (

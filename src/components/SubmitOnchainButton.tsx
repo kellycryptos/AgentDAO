@@ -27,7 +27,7 @@ function parseFriendlyError(error: any): string {
   return error?.shortMessage || "Transaction failed on GIWA Sepolia. Please try again.";
 }
 
-export function SubmitOnchainButton({ groupId = 0n, title, summary, amount }: SubmitOnchainButtonProps) {
+export function SubmitOnchainButton({ groupId = BigInt(0), title, summary, amount }: SubmitOnchainButtonProps) {
   const { isConnected } = useAccount();
   const chainId = useChainId();
   const isCorrectNetwork = chainId === 91342;

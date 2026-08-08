@@ -82,7 +82,7 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
     query: { refetchInterval: 4000 },
   });
 
-  const groupId = proposal?.groupId ?? 0n;
+  const groupId = proposal?.groupId ?? BigInt(0);
 
   const { data: group } = useReadContract({
     address: PROPOSAL_REGISTRY_ADDRESS,
@@ -197,7 +197,7 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
 
   const thresholdBps = group ? Number(group.approvalThresholdBps) : 5100;
   const totalVotes = yesVotes + noVotes;
-  const isPassed = totalVotes > 0n && (yesVotes * 10000n) >= (totalVotes * BigInt(thresholdBps));
+  const isPassed = totalVotes > BigInt(0) && (yesVotes * BigInt(10000)) >= (totalVotes * BigInt(thresholdBps));
 
   const isAdmin = address && group && group.admin.toLowerCase() === address.toLowerCase();
 
