@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import {
   useAccount,
   useChainId,
@@ -30,6 +31,7 @@ import {
   Plus,
   UserCheck,
   Eye,
+  ArrowRight,
 } from "lucide-react";
 
 interface ProposalItemProps {
@@ -267,7 +269,12 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
               </span>
             )}
           </div>
-          <h3 className="font-bold text-base sm:text-lg text-[var(--text-primary)] group-hover:text-[var(--accent-violet)] transition-colors">{title}</h3>
+          <Link href={`/proposal/${id.toString()}`} className="group/title inline-block">
+            <h3 className="font-bold text-base sm:text-lg text-[var(--text-primary)] group-hover/title:text-[var(--accent-violet)] transition-colors flex items-center gap-1.5">
+              <span>{title}</span>
+              <ArrowRight className="w-4 h-4 opacity-0 -translate-x-1 group-hover/title:opacity-100 group-hover/title:translate-x-0 transition-all text-[var(--accent-violet)] shrink-0" />
+            </h3>
+          </Link>
         </div>
 
         <div className="bg-[var(--bg-card-subtle)] px-3.5 py-2 rounded-xl border border-[var(--border-color)] flex items-center gap-2 self-start sm:self-auto shrink-0 shadow-inner">
@@ -450,6 +457,17 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
             </a>
           </div>
         )}
+
+        {/* Detail Link CTA */}
+        <div className="pt-2 border-t border-[var(--border-color)] flex justify-end">
+          <Link
+            href={`/proposal/${id.toString()}`}
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--accent-violet)] hover:underline group/btn"
+          >
+            <span>View full details & history</span>
+            <ArrowRight className="w-3.5 h-3.5 transform group-hover/btn:translate-x-1 transition-transform" />
+          </Link>
+        </div>
       </div>
     </div>
   );

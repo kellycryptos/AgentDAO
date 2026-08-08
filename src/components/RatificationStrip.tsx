@@ -144,20 +144,22 @@ export function RatificationStrip() {
                 fieldStep >= 3 ? "opacity-100 translate-y-0" : "opacity-0 translate-y-1"
               }`}
             >
-              <span className="text-xs font-serif-headline font-bold text-[var(--text-muted)]">
-                Grant Requested:
-              </span>
-              <span className="text-sm font-bold font-receipt-mono text-[var(--accent-violet)] bg-[var(--accent-violet-bg)] px-2.5 py-1 rounded border border-[var(--accent-violet-border)]">
-                2,000 USDC
-              </span>
+              <div className="flex items-center gap-2 max-w-[60%] shrink-0">
+                <span className="text-xs font-serif-headline font-bold text-[var(--text-muted)] shrink-0">
+                  Grant Requested:
+                </span>
+                <span className="text-xs sm:text-sm font-bold font-receipt-mono text-[var(--accent-violet)] bg-[var(--accent-violet-bg)] px-2.5 py-1 rounded border border-[var(--accent-violet-border)] truncate">
+                  2,000 USDC
+                </span>
+              </div>
             </div>
 
             {/* Ratified Stamp */}
             {stage === "stamped" && (
-              <div className="absolute right-4 bottom-10 sm:right-6 sm:bottom-12 pointer-events-none z-10 animate-stamp">
-                <div className="border-4 border-[#00D9B5] rounded-xl px-4 py-1.5 transform -rotate-6 bg-[#00D9B5]/10 backdrop-blur-[1px] shadow-lg shadow-[#00D9B5]/20 flex items-center gap-1.5">
-                  <CheckCircle2 className="w-5 h-5 text-[#00D9B5]" />
-                  <span className="text-lg sm:text-xl font-black font-receipt-mono tracking-widest text-[#00D9B5] uppercase">
+              <div className="absolute right-3 bottom-[2.85rem] sm:right-5 sm:bottom-[3.1rem] pointer-events-none z-10 animate-stamp">
+                <div className="border-3 sm:border-4 border-[#00D9B5] rounded-xl px-3 py-1 sm:px-4 sm:py-1.5 transform -rotate-6 bg-[#00D9B5]/10 backdrop-blur-[1px] shadow-lg shadow-[#00D9B5]/20 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#00D9B5]" />
+                  <span className="text-base sm:text-xl font-black font-receipt-mono tracking-widest text-[#00D9B5] uppercase">
                     RATIFIED
                   </span>
                 </div>
