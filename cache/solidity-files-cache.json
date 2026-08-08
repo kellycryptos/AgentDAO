@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "C:\\Users\\HP\\Downloads\\AgentDao\\contracts\\ProposalRegistry.sol": {
-      "lastModificationDate": 1786088078401,
-      "contentHash": "80565e9eac56dc89b370b71a1657523a",
+      "lastModificationDate": 1786204107473,
+      "contentHash": "939b40e970163548da6a2b054d86d685",
       "sourceName": "contracts/ProposalRegistry.sol",
       "solcConfig": {
         "version": "0.8.20",
@@ -12,6 +12,7 @@
             "enabled": true,
             "runs": 200
           },
+          "viaIR": true,
           "evmVersion": "paris",
           "outputSelection": {
             "*": {
@@ -35,6 +36,44 @@
       ],
       "artifacts": [
         "ProposalRegistry"
+      ]
+    },
+    "C:\\Users\\HP\\Downloads\\AgentDao\\contracts\\test\\ReentrantMaliciousReceiver.sol": {
+      "lastModificationDate": 1786204441373,
+      "contentHash": "805964ba8cf4ee40d2a9a2a70e24050c",
+      "sourceName": "contracts/test/ReentrantMaliciousReceiver.sol",
+      "solcConfig": {
+        "version": "0.8.20",
+        "settings": {
+          "optimizer": {
+            "enabled": true,
+            "runs": 200
+          },
+          "viaIR": true,
+          "evmVersion": "paris",
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IProposalRegistry",
+        "ReentrantMaliciousReceiver"
       ]
     }
   }

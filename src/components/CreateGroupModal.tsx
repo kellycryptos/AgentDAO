@@ -75,11 +75,11 @@ export function CreateGroupModal({ isOpen, onClose, onGroupCreated }: CreateGrou
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-[100] flex min-h-full items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative max-h-[90vh] flex flex-col"
+        className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl max-w-lg w-full p-5 sm:p-6 shadow-2xl relative max-h-[85vh] flex flex-col my-auto overflow-hidden text-left"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -102,30 +102,29 @@ export function CreateGroupModal({ isOpen, onClose, onGroupCreated }: CreateGrou
           </div>
         </div>
 
-        <div className="overflow-y-auto flex-1 pt-4 pr-1 space-y-4 min-h-0">
-          {errorMsg && (
-            <div className="bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 p-3 rounded-xl text-xs flex items-center gap-2 font-mono">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{errorMsg}</span>
-            </div>
-          )}
+        {errorMsg && (
+          <div className="mt-3 bg-rose-500/10 border border-rose-500/30 text-rose-600 dark:text-rose-400 p-3 rounded-xl text-xs flex items-center gap-2 font-mono shrink-0">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
 
-          {isConfirmed ? (
-            <div className="text-center py-6 space-y-3">
-              <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto animate-bounce" />
-              <h4 className="font-bold text-base text-[var(--text-primary)]">Group Created Successfully!</h4>
-              <p className="text-xs text-[var(--text-muted)] font-mono">
-                Your group is registered on GIWA Sepolia. You are the Group Admin.
-              </p>
-              <button
-                onClick={onClose}
-                className="bg-[var(--accent-violet)] hover:bg-[var(--accent-violet)]/90 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-md"
-              >
-                Done
-              </button>
-            </div>
-          ) : (
-            <form onSubmit={handleCreate} className="space-y-4 text-xs">
+        {isConfirmed ? (
+          <div className="text-center py-6 space-y-3 overflow-y-auto flex-1 min-h-0 pt-4">
+            <CheckCircle2 className="w-12 h-12 text-emerald-500 mx-auto animate-bounce" />
+            <h4 className="font-bold text-base text-[var(--text-primary)]">Group Created Successfully!</h4>
+            <p className="text-xs text-[var(--text-muted)] font-mono">
+              Your group is registered on GIWA Sepolia. You are the Group Admin.
+            </p>
+            <button
+              onClick={onClose}
+              className="bg-[var(--accent-violet)] hover:bg-[var(--accent-violet)]/90 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition-all shadow-md"
+            >
+              Done
+            </button>
+          </div>
+        ) : (
+          <form onSubmit={handleCreate} className="space-y-4 text-xs overflow-y-auto flex-1 min-h-0 pt-4 pr-1">
               <div>
                 <label className="block font-semibold text-[var(--text-primary)] mb-1">Group Name</label>
                 <input
@@ -248,7 +247,6 @@ export function CreateGroupModal({ isOpen, onClose, onGroupCreated }: CreateGrou
               </div>
             </form>
           )}
-        </div>
       </div>
     </div>
   );

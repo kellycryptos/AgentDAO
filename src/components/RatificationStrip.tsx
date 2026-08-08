@@ -31,16 +31,16 @@ export function RatificationStrip() {
         charIndex++;
       } else {
         clearInterval(typeInterval);
-        setTimeout(() => setStage("tearing"), 400);
+        setTimeout(() => setStage("tearing"), 200);
       }
-    }, 40);
+    }, 20);
 
     return () => clearInterval(typeInterval);
   }, []);
 
   useEffect(() => {
     if (stage === "tearing") {
-      const timer = setTimeout(() => setStage("fields"), 500);
+      const timer = setTimeout(() => setStage("fields"), 300);
       return () => clearTimeout(timer);
     }
 
@@ -49,10 +49,10 @@ export function RatificationStrip() {
         setFieldStep((prev) => {
           if (prev < 3) return prev + 1;
           clearInterval(fieldTimer);
-          setTimeout(() => setStage("stamped"), 400);
+          setTimeout(() => setStage("stamped"), 200);
           return prev;
         });
-      }, 350);
+      }, 200);
       return () => clearInterval(fieldTimer);
     }
   }, [stage]);

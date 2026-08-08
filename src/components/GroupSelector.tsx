@@ -193,7 +193,10 @@ export function GroupSelector({ selectedGroupId, onSelectGroup }: GroupSelectorP
         </div>
 
         <button
+          type="button"
           onClick={() => setIsCreateOpen(true)}
+          aria-label="Create new group"
+          title="Create new group"
           className="inline-flex items-center gap-1.5 bg-[var(--accent-violet-bg)] border border-[var(--accent-violet-border)] hover:bg-[var(--accent-violet)] hover:text-white text-[var(--accent-violet)] px-3 py-2 rounded-xl text-xs font-bold transition-all shadow-sm cursor-pointer"
         >
           <Plus className="w-4 h-4" />

@@ -9,8 +9,11 @@ import {
   useWriteContract,
   useWaitForTransactionReceipt,
 } from "wagmi";
+import { parseEther, formatEther } from "viem";
 import { PROPOSAL_REGISTRY_ADDRESS, PROPOSAL_REGISTRY_ABI } from "@/lib/abi";
 import { AddMemberPanel } from "@/components/AddMemberPanel";
+import { DepositTreasuryModal } from "@/components/DepositTreasuryModal";
+import { CreateProposalModal } from "@/components/CreateProposalModal";
 import {
   ThumbsUp,
   ThumbsDown,
@@ -32,6 +35,10 @@ import {
   UserCheck,
   Eye,
   ArrowRight,
+  Wallet,
+  Sliders,
+  Coins,
+  ArrowUpRight,
 } from "lucide-react";
 
 interface ProposalItemProps {
@@ -48,6 +55,12 @@ function parseFriendlyError(error: any): string {
   if (msg.includes("insufficient funds")) {
     return "Insufficient testnet ETH for gas fees on GIWA Sepolia.";
   }
+  if (msg.includes("InsufficientTreasuryFunds")) {
+    return "Group treasury has insufficient funds to execute payout.";
+  }
+  if (msg.includes("ExceedsMaxDisbursement")) {
+    return "Requested amount exceeds group's maximum disbursement cap.";
+  }
   if (msg.includes("AlreadyVoted")) {
     return "You have already voted on this proposal.";
   }
@@ -60,15 +73,11 @@ function parseFriendlyError(error: any): string {
   return error?.shortMessage || "Transaction failed. Please try again.";
 }
 
-const THRESHOLD = BigInt("1000000000000000");
-const WEI_UNIT = BigInt("1000000000000000000");
-
-const formatAmountDisplay = (rawAmount: bigint): string => {
-  if (rawAmount >= THRESHOLD) {
-    const scaled = Number(rawAmount / WEI_UNIT);
-    return `${scaled.toLocaleString()} USDC`;
-  }
-  return `${Number(rawAmount).toLocaleString()} USDC`;
+const formatEthDisplay = (rawWei: bigint): string => {
+  if (rawWei === BigInt(0)) return "0 ETH";
+  const val = Number(formatEther(rawWei));
+  if (val < 0.0001) return `${rawWei.toString()} Wei`;
+  return `${val.toFixed(4)} ETH`;
 };
 
 function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
@@ -150,21 +159,6 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
     }
   };
 
-  const handleJoinGroup = async () => {
-    setLocalError(null);
-    try {
-      await writeContractAsync({
-        address: PROPOSAL_REGISTRY_ADDRESS,
-        abi: PROPOSAL_REGISTRY_ABI,
-        functionName: "joinGroup",
-        args: [groupId],
-      });
-      refetchIsMember();
-    } catch (err: any) {
-      setLocalError(parseFriendlyError(err));
-    }
-  };
-
   if (!proposal) {
     return (
       <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6 space-y-3 animate-pulse">
@@ -178,13 +172,29 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
     );
   }
 
-  // Filter out if selectedGroupId is specified and doesn't match
   if (selectedGroupId !== undefined && proposal.groupId !== selectedGroupId) {
     return null;
   }
 
-  const { title, summary, amount, proposer, yesVotes, noVotes, createdAt, deadline, finalized } = proposal;
-  const formattedAmount = formatAmountDisplay(amount);
+  const {
+    title,
+    summary,
+    amount,
+    proposer,
+    yesVotes,
+    noVotes,
+    createdAt,
+    deadline,
+    finalized,
+    executed,
+    proposalType,
+    proposedMaxDisbursement,
+    proposedHighValueThreshold,
+    proposedHighValueApprovalBps,
+  } = proposal;
+
+  const isRuleChange = proposalType === 1;
+  const formattedAmount = formatEthDisplay(amount);
   const formattedDate = new Date(Number(createdAt) * 1000).toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
@@ -197,7 +207,14 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
   const deadlineNum = Number(deadline || BigInt(0));
   const isExpired = deadlineNum > 0 && nowSec >= deadlineNum;
 
-  const thresholdBps = group ? Number(group.approvalThresholdBps) : 5100;
+  // Determine required threshold
+  const isHighValue = !isRuleChange && group && group.highValueThreshold > BigInt(0) && amount > group.highValueThreshold;
+  const thresholdBps = group
+    ? isHighValue
+      ? Number(group.highValueApprovalBps)
+      : Number(group.approvalThresholdBps)
+    : 5100;
+
   const totalVotes = yesVotes + noVotes;
   const isPassed = totalVotes > BigInt(0) && (yesVotes * BigInt(10000)) >= (totalVotes * BigInt(thresholdBps));
 
@@ -227,6 +244,17 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
               Proposal #{id.toString()}
             </span>
 
+            {/* Proposal Type Badge */}
+            {isRuleChange ? (
+              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/30 font-extrabold flex items-center gap-1">
+                <Sliders className="w-3 h-3 text-violet-500" /> Rule Change Proposal
+              </span>
+            ) : (
+              <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-extrabold flex items-center gap-1">
+                <Coins className="w-3 h-3 text-emerald-500" /> Funding Request
+              </span>
+            )}
+
             {/* Group Tag */}
             <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-[var(--bg-card-subtle)] text-[var(--text-secondary)] border border-[var(--border-color)] font-medium flex items-center gap-1">
               <Users className="w-3 h-3 text-[var(--accent-violet)]" />
@@ -250,9 +278,19 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
 
             {/* Status Badges */}
             {finalized ? (
-              isPassed ? (
-                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-extrabold flex items-center gap-1">
-                  <CheckCircle2 className="w-3 h-3 text-emerald-500" /> PASSED ({(thresholdBps / 100).toFixed(0)}% THRESHOLD MET)
+              executed ? (
+                isRuleChange ? (
+                  <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/30 font-extrabold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-violet-500" /> EXECUTED (RULES UPDATED)
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 font-extrabold flex items-center gap-1">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-500" /> EXECUTED ({formattedAmount} SENT)
+                  </span>
+                )
+              ) : isPassed ? (
+                <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30 font-extrabold flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 text-amber-500" /> FAILED (INSUFFICIENT FUNDS)
                 </span>
               ) : (
                 <span className="text-[10px] font-mono uppercase px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-600 dark:text-rose-400 border border-rose-500/30 font-extrabold flex items-center gap-1">
@@ -278,10 +316,18 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
         </div>
 
         <div className="bg-[var(--bg-card-subtle)] px-3.5 py-2 rounded-xl border border-[var(--border-color)] flex items-center gap-2 self-start sm:self-auto shrink-0 shadow-inner">
-          <DollarSign className="w-4 h-4 text-[var(--accent-mint)]" />
+          {isRuleChange ? (
+            <Sliders className="w-4 h-4 text-violet-400" />
+          ) : (
+            <Coins className="w-4 h-4 text-emerald-500" />
+          )}
           <div>
-            <div className="text-[10px] uppercase text-[var(--text-muted)] font-mono">Amount</div>
-            <div className="text-xs sm:text-sm font-bold font-mono text-[var(--accent-mint)]">{formattedAmount}</div>
+            <div className="text-[10px] uppercase text-[var(--text-muted)] font-mono">
+              {isRuleChange ? "Type" : "Requested"}
+            </div>
+            <div className="text-xs sm:text-sm font-bold font-mono text-[var(--text-primary)]">
+              {isRuleChange ? "Rule Update" : formattedAmount}
+            </div>
           </div>
         </div>
       </div>
@@ -290,6 +336,35 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
       <p className="text-sm text-[var(--text-primary)] leading-relaxed bg-[var(--bg-card-subtle)] p-3.5 rounded-xl border border-[var(--border-color)]">
         {summary}
       </p>
+
+      {/* Before / After Comparison for RuleChange proposals */}
+      {isRuleChange && (
+        <div className="bg-violet-500/10 border border-violet-500/30 p-3.5 rounded-xl text-xs space-y-2 font-mono">
+          <span className="font-bold text-violet-600 dark:text-violet-300 block">
+            Proposed Spending Rule Changes:
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+            <div className="bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-color)]">
+              <span className="text-[var(--text-muted)] block">Max Cap:</span>
+              <span className="text-[var(--text-primary)] font-bold">
+                {formatEthDisplay(group?.maxDisbursementPerProposal || BigInt(0))} → {formatEthDisplay(proposedMaxDisbursement)}
+              </span>
+            </div>
+            <div className="bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-color)]">
+              <span className="text-[var(--text-muted)] block">High Threshold:</span>
+              <span className="text-[var(--text-primary)] font-bold">
+                {formatEthDisplay(group?.highValueThreshold || BigInt(0))} → {formatEthDisplay(proposedHighValueThreshold)}
+              </span>
+            </div>
+            <div className="bg-[var(--bg-card)] p-2 rounded-lg border border-[var(--border-color)]">
+              <span className="text-[var(--text-muted)] block">Supermajority:</span>
+              <span className="text-[var(--text-primary)] font-bold">
+                {(Number(group?.highValueApprovalBps || 5100) / 100).toFixed(0)}% → {(Number(proposedHighValueApprovalBps) / 100).toFixed(0)}%
+              </span>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Proposer details */}
       <div className="flex items-center justify-between text-xs text-[var(--text-muted)] pt-1 flex-wrap gap-2">
@@ -307,7 +382,8 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
           </a>
         </div>
         <div className="text-[11px] font-mono text-[var(--text-muted)]">
-          Approval Threshold: <strong className="text-[var(--text-primary)] font-bold">{(thresholdBps / 100).toFixed(1)}%</strong>
+          Required Approval: <strong className="text-[var(--text-primary)] font-bold">{(thresholdBps / 100).toFixed(1)}%</strong>
+          {isHighValue && <span className="ml-1 text-amber-500 font-bold">(High-Value Supermajority)</span>}
         </div>
       </div>
 
@@ -331,13 +407,33 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
 
         {/* Voting / Finalize / Guest Action Section */}
         {finalized ? (
-          <div className={`text-xs p-3 rounded-xl border text-center font-bold flex items-center justify-center gap-2 ${
-            isPassed
+          <div className={`text-xs p-3.5 rounded-xl border text-center font-bold flex items-center justify-center gap-2 ${
+            executed
               ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-300 border-emerald-500/30"
+              : isPassed
+              ? "bg-amber-500/10 text-amber-600 dark:text-amber-300 border-amber-500/30"
               : "bg-rose-500/10 text-rose-600 dark:text-rose-300 border-rose-500/30"
           }`}>
-            {isPassed ? <CheckCircle2 className="w-4 h-4 text-emerald-500" /> : <AlertCircle className="w-4 h-4 text-rose-500" />}
-            <span>Proposal Finalized — Outcome: {isPassed ? `PASSED (${(thresholdBps / 100).toFixed(0)}% THRESHOLD MET)` : "REJECTED"}</span>
+            {executed ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+                <span>
+                  {isRuleChange
+                    ? "Executed: Spending rules updated onchain!"
+                    : `Executed: ${formattedAmount} auto-sent to proposer!`}
+                </span>
+              </>
+            ) : isPassed ? (
+              <>
+                <AlertCircle className="w-4 h-4 text-amber-500" />
+                <span>Passed but Failed Execution: Insufficient Group Treasury Funds!</span>
+              </>
+            ) : (
+              <>
+                <AlertCircle className="w-4 h-4 text-rose-500" />
+                <span>Proposal Rejected — Failed {(thresholdBps / 100).toFixed(0)}% Threshold Bar</span>
+              </>
+            )}
           </div>
         ) : isExpired ? (
           <button
@@ -349,222 +445,230 @@ function ProposalItem({ id, selectedGroupId }: ProposalItemProps) {
             {isWritePending && isFinalizingAction ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Signing Finalize Tx...</span>
+                <span>Finalizing Onchain...</span>
               </>
             ) : (
               <>
-                <CheckCircle2 className="w-4 h-4" />
+                <RefreshCw className="w-4 h-4" />
                 <span>Finalize Proposal Onchain</span>
               </>
             )}
           </button>
-        ) : !isConnected ? (
-          <div className="text-xs text-[var(--text-muted)] text-center italic py-2.5 bg-[var(--bg-card-subtle)] rounded-xl border border-[var(--border-color)]">
-            Connect wallet on GIWA Sepolia to vote.
-          </div>
-        ) : !isCorrectNetwork ? (
-          <div className="text-xs text-amber-600 dark:text-amber-300 text-center py-2.5 bg-amber-500/10 rounded-xl border border-amber-500/30 font-medium">
-            Switch network to GIWA Sepolia to vote.
-          </div>
-        ) : !isMember && !isAdmin ? (
-          /* GUEST STATE — Clear Membership Block Prompt */
-          <div className="bg-[var(--accent-violet-bg)] border border-[var(--accent-violet-border)] p-3.5 rounded-xl text-center space-y-2">
-            <div className="text-xs font-semibold text-[var(--text-primary)] flex items-center justify-center gap-1.5">
-              <Eye className="w-4 h-4 text-[var(--accent-violet)]" />
-              <span>You are viewing as a Guest. Join this group to participate in voting.</span>
-            </div>
-            {group?.isOpen ? (
-              <button
-                type="button"
-                onClick={handleJoinGroup}
-                disabled={isWritePending || isConfirming}
-                className="inline-flex items-center gap-1.5 bg-[#00E5C7] hover:bg-[#00C4AA] text-slate-950 font-bold text-xs px-5 py-2 rounded-xl transition-all shadow-sm cursor-pointer disabled:opacity-50"
-              >
-                {isWritePending && !isFinalizingAction ? (
-                  <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    <span>Joining Group...</span>
-                  </>
-                ) : (
-                  <>
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Join Group to Vote</span>
-                  </>
-                )}
-              </button>
-            ) : (
-              <p className="text-[11px] text-[var(--text-muted)] italic">
-                This is an invite-only group. Contact the Group Admin ({group?.admin.slice(0, 6)}...{group?.admin.slice(-4)}) to request access.
-              </p>
-            )}
-          </div>
-        ) : hasVotedUser ? (
-          <div className="text-xs text-[var(--accent-mint)] bg-[var(--accent-mint-bg)] border border-[var(--accent-mint)]/30 p-2.5 rounded-xl text-center font-medium flex items-center justify-center gap-1.5">
-            <CheckCircle2 className="w-4 h-4" />
-            <span>You have already voted on this proposal</span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-3">
+        ) : isMember || isAdmin ? (
+          <div className="flex gap-3">
             <button
               type="button"
               onClick={() => handleVote(true)}
-              disabled={isWritePending || isConfirming}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
+              disabled={isWritePending || isConfirming || hasVotedUser || !isConnected || !isCorrectNetwork}
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
-              {isWritePending && !isFinalizingAction && voteType === true ? (
+              {isWritePending && voteType === true ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <ThumbsUp className="w-3.5 h-3.5" />
+                <ThumbsUp className="w-4 h-4" />
               )}
-              <span>Vote YES</span>
+              <span>{hasVotedUser ? "Voted YES" : "Vote YES"}</span>
             </button>
 
             <button
               type="button"
               onClick={() => handleVote(false)}
-              disabled={isWritePending || isConfirming}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
+              disabled={isWritePending || isConfirming || hasVotedUser || !isConnected || !isCorrectNetwork}
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all shadow-md active:scale-95 disabled:opacity-50 cursor-pointer"
             >
-              {isWritePending && !isFinalizingAction && voteType === false ? (
+              {isWritePending && voteType === false ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
-                <ThumbsDown className="w-3.5 h-3.5" />
+                <ThumbsDown className="w-4 h-4" />
               )}
-              <span>Vote NO</span>
+              <span>{hasVotedUser ? "Voted NO" : "Vote NO"}</span>
             </button>
+          </div>
+        ) : group?.isOpen ? (
+          <button
+            type="button"
+            onClick={handleJoinGroup}
+            disabled={isWritePending || isConfirming || !isConnected || !isCorrectNetwork}
+            className="w-full inline-flex items-center justify-center gap-2 bg-[#00E5C7] hover:bg-[#00C4AA] text-slate-950 font-bold text-xs uppercase tracking-wider px-4 py-2.5 rounded-xl transition-all shadow-md cursor-pointer disabled:opacity-50"
+          >
+            {isWritePending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Joining Group...</span>
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4" />
+                <span>Join Group to Participate</span>
+              </>
+            )}
+          </button>
+        ) : (
+          <div className="text-center py-2.5 px-3 bg-violet-500/10 border border-violet-500/30 rounded-xl text-xs text-violet-400 font-mono">
+            Invite-Only Group — Contact Group Admin ({group?.admin.slice(0, 6)}...{group?.admin.slice(-4)}) to join
           </div>
         )}
 
         {(writeError || localError) && (
-          <div className="text-xs text-red-600 dark:text-red-300 bg-red-500/10 p-2.5 rounded-xl border border-red-500/30 flex items-center gap-2 font-medium">
-            <AlertCircle className="w-4 h-4 text-red-500 dark:text-red-400 shrink-0" />
+          <div className="text-xs text-rose-300 bg-rose-950/40 p-3 rounded-xl border border-rose-500/30 flex items-center gap-2 font-mono">
+            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
             <span>{localError || parseFriendlyError(writeError)}</span>
           </div>
         )}
+      </div>
 
-        {isConfirmed && hash && (
-          <div className="text-xs text-[var(--accent-mint)] bg-[var(--accent-mint-bg)] p-2.5 rounded-xl flex items-center justify-between flex-wrap gap-2 border border-[var(--accent-mint)]/30 font-medium">
-            <span className="flex items-center gap-1.5 font-medium">
-              <CheckCircle2 className="w-4 h-4" /> {isFinalizingAction ? "Proposal Finalized Onchain!" : "Action Recorded Onchain!"}
-            </span>
-            <a
-              href={`https://sepolia-explorer.giwa.io/tx/${hash}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-mono underline text-[11px] hover:text-[var(--text-primary)]"
-            >
-              View Tx Explorer
-            </a>
-          </div>
-        )}
-
-        {/* Detail Link CTA */}
-        <div className="pt-2 border-t border-[var(--border-color)] flex justify-end">
-          <Link
-            href={`/proposal/${id.toString()}`}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--accent-violet)] hover:underline group/btn"
-          >
-            <span>View full details & history</span>
-            <ArrowRight className="w-3.5 h-3.5 transform group-hover/btn:translate-x-1 transition-transform" />
-          </Link>
-        </div>
+      <div className="pt-2 flex items-center justify-between border-t border-[var(--border-color)] text-[11px] font-mono text-[var(--text-muted)]">
+        <span>View full proposal metrics, timeline & block history</span>
+        <Link href={`/proposal/${id.toString()}`} className="text-[var(--accent-violet)] hover:underline flex items-center gap-1 font-bold">
+          <span>Details →</span>
+        </Link>
       </div>
     </div>
   );
 }
 
-interface ProposalListProps {
-  selectedGroupId?: bigint;
-}
+export function ProposalList({ selectedGroupId = BigInt(0) }: { selectedGroupId?: bigint }) {
+  const [isDepositOpen, setIsDepositOpen] = useState(false);
+  const [isCreateProposalOpen, setIsCreateProposalOpen] = useState(false);
 
-export function ProposalList({ selectedGroupId }: ProposalListProps) {
-  const { data: count, isLoading, isError, refetch } = useReadContract({
+  const { data: count, isLoading, refetch } = useReadContract({
     address: PROPOSAL_REGISTRY_ADDRESS,
     abi: PROPOSAL_REGISTRY_ABI,
     functionName: "proposalCount",
-    query: {
-      refetchInterval: 5000,
-      retry: 3,
-      retryDelay: 1000,
-    },
+    query: { refetchInterval: 4000 },
   });
 
-  const proposalCountNum = count ? Number(count) : 0;
-  const proposalIds = Array.from({ length: proposalCountNum }, (_, i) => BigInt(i)).reverse();
+  const { data: group } = useReadContract({
+    address: PROPOSAL_REGISTRY_ADDRESS,
+    abi: PROPOSAL_REGISTRY_ABI,
+    functionName: "getGroup",
+    args: [selectedGroupId],
+    query: { refetchInterval: 4000 },
+  });
+
+  const total = Number(count || BigInt(0));
+  const proposalIds = Array.from({ length: total }, (_, i) => BigInt(i)).reverse();
+
+  const treasuryEth = group?.treasuryBalance ? formatEther(group.treasuryBalance) : "0.0";
+  const maxCapEth = group?.maxDisbursementPerProposal ? formatEther(group.maxDisbursementPerProposal) : "0.0";
 
   return (
-    <section id="proposals-list" className="border-t border-[var(--border-color)] pt-12 pb-16 transition-colors">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <Vote className="w-5 h-5 text-[var(--accent-mint)]" />
-              <h2 className="text-xl sm:text-2xl font-bold text-[var(--text-primary)] tracking-tight">GIWA Sepolia Onchain Proposals</h2>
+    <div className="space-y-6">
+      {/* Group Treasury Header Card */}
+      <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-5 sm:p-6 shadow-lg space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-lg font-bold text-[var(--text-primary)]">
+                {group ? group.name : `Group #${selectedGroupId.toString()}`}
+              </h2>
+              <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-[var(--accent-violet-bg)] text-[var(--accent-violet)] border border-[var(--accent-violet)]/30 font-semibold">
+                Group #{selectedGroupId.toString()}
+              </span>
             </div>
-            <p className="text-xs text-[var(--text-muted)]">
-              Registered proposals on `ProposalRegistry` contract ({PROPOSAL_REGISTRY_ADDRESS.slice(0, 8)}...{PROPOSAL_REGISTRY_ADDRESS.slice(-6)})
-            </p>
+            <p className="text-xs text-[var(--text-secondary)]">{group?.description || "Community Governance Group"}</p>
           </div>
 
-          <div className="flex items-center gap-3 self-start sm:self-auto">
+          <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
             <button
-              onClick={() => refetch()}
-              className="p-2 rounded-xl bg-[var(--bg-card)] hover:bg-[var(--bg-card-subtle)] text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border-color)] transition-all cursor-pointer shadow-sm"
-              title="Refresh proposal list"
+              onClick={() => setIsDepositOpen(true)}
+              className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
             >
-              <RefreshCw className="w-4 h-4" />
+              <Wallet className="w-4 h-4" />
+              <span>Deposit ETH</span>
             </button>
-            <div className="bg-[var(--bg-card)] px-3.5 py-1.5 rounded-xl border border-[var(--border-color)] text-xs font-mono text-[var(--accent-mint)] flex items-center gap-2 font-semibold shadow-sm">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Total: {proposalCountNum}</span>
-            </div>
+
+            <button
+              onClick={() => setIsCreateProposalOpen(true)}
+              className="bg-[var(--accent-violet)] hover:opacity-90 text-white font-bold text-xs px-3.5 py-2 rounded-xl flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Proposal</span>
+            </button>
           </div>
         </div>
 
-        {isLoading ? (
-          <div className="space-y-4">
-            {[1, 2].map((n) => (
-              <div key={n} className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6 space-y-3 animate-pulse">
-                <div className="flex items-center justify-between">
-                  <div className="h-4 bg-[var(--border-color)] rounded w-1/4" />
-                  <div className="h-6 bg-[var(--border-color)] rounded w-20" />
-                </div>
-                <div className="h-5 bg-[var(--border-color)] rounded w-3/4" />
-                <div className="h-16 bg-[var(--bg-card-subtle)] rounded-xl" />
-              </div>
-            ))}
+        {/* Treasury Metrics Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          <div className="bg-[var(--bg-card-secondary)] p-3 rounded-xl border border-[var(--border-color)] font-mono">
+            <span className="text-[11px] text-[var(--text-muted)] block">Treasury Balance</span>
+            <span className="text-base font-bold text-emerald-500">{treasuryEth} ETH</span>
           </div>
-        ) : isError ? (
-          <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-8 text-center space-y-3">
-            <AlertCircle className="w-8 h-8 text-red-500 dark:text-red-400 mx-auto" />
-            <h3 className="font-semibold text-[var(--text-primary)]">Unable to Load Proposals</h3>
-            <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto">
-              Failed to connect to GIWA Sepolia RPC. Please check your network connection or try refreshing.
-            </p>
-            <button
-              onClick={() => refetch()}
-              className="inline-flex items-center gap-2 text-xs font-semibold px-4 py-2 rounded-xl bg-red-500/20 border border-red-500/30 text-red-700 dark:text-red-200 hover:bg-red-500/30 transition-all cursor-pointer"
-            >
-              <RefreshCw className="w-3.5 h-3.5" /> Retry Fetching
-            </button>
+          <div className="bg-[var(--bg-card-secondary)] p-3 rounded-xl border border-[var(--border-color)] font-mono">
+            <span className="text-[11px] text-[var(--text-muted)] block">Max Disbursement Cap</span>
+            <span className="text-base font-bold text-[var(--text-primary)]">
+              {group?.maxDisbursementPerProposal && group.maxDisbursementPerProposal > BigInt(0) ? `${maxCapEth} ETH` : "No Cap"}
+            </span>
           </div>
-        ) : proposalCountNum === 0 ? (
-          <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-8 text-center space-y-3 shadow-sm">
-            <Vote className="w-8 h-8 text-[var(--text-muted)] opacity-50 mx-auto" />
-            <h3 className="font-semibold text-[var(--text-primary)] text-base">No Onchain Proposals Yet</h3>
-            <p className="text-xs text-[var(--text-muted)] max-w-md mx-auto leading-relaxed">
-              Draft a governance proposal with the AI assistant above and click <strong className="text-[var(--accent-violet)]">"Submit Onchain"</strong> to create the first live proposal!
-            </p>
+          <div className="bg-[var(--bg-card-secondary)] p-3 rounded-xl border border-[var(--border-color)] font-mono">
+            <span className="text-[11px] text-[var(--text-muted)] block">Approval Threshold</span>
+            <span className="text-base font-bold text-[var(--text-primary)]">
+              {(Number(group?.approvalThresholdBps || 5100) / 100).toFixed(1)}%
+            </span>
           </div>
-        ) : (
-          <div className="space-y-6">
-            {proposalIds.map((id) => (
-              <ProposalItem key={id.toString()} id={id} selectedGroupId={selectedGroupId} />
-            ))}
-          </div>
-        )}
+        </div>
       </div>
-    </section>
+
+      {/* Proposal Feed Header */}
+      <div className="flex items-center justify-between pt-2">
+        <h3 className="font-bold text-base text-[var(--text-primary)] flex items-center gap-2">
+          <Vote className="w-5 h-5 text-[var(--accent-violet)]" />
+          <span>Governance Proposals ({total})</span>
+        </h3>
+        <button
+          onClick={() => refetch()}
+          className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] flex items-center gap-1 font-mono transition-colors cursor-pointer"
+        >
+          <RefreshCw className="w-3.5 h-3.5" />
+          <span>Refresh</span>
+        </button>
+      </div>
+
+      {/* Proposal Items */}
+      {isLoading ? (
+        <div className="space-y-4">
+          <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6 h-32 animate-pulse" />
+          <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-6 h-32 animate-pulse" />
+        </div>
+      ) : total === 0 ? (
+        <div className="bg-[var(--bg-card)] border border-[var(--border-color)] rounded-2xl p-8 text-center space-y-3">
+          <Vote className="w-12 h-12 text-[var(--text-muted)] mx-auto opacity-50" />
+          <h4 className="font-bold text-base text-[var(--text-primary)]">No Onchain Proposals Yet</h4>
+          <p className="text-xs text-[var(--text-muted)] max-w-sm mx-auto">
+            Be the first member to submit an onchain proposal for Group #{selectedGroupId.toString()}!
+          </p>
+          <button
+            onClick={() => setIsCreateProposalOpen(true)}
+            className="bg-[var(--accent-violet)] text-white font-bold text-xs px-4 py-2 rounded-xl transition-all shadow-md inline-flex items-center gap-1.5"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Proposal</span>
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {proposalIds.map((pId) => (
+            <ProposalItem key={pId.toString()} id={pId} selectedGroupId={selectedGroupId} />
+          ))}
+        </div>
+      )}
+
+      {/* Deposit Treasury Modal */}
+      {isDepositOpen && (
+        <DepositTreasuryModal
+          groupId={selectedGroupId}
+          onClose={() => setIsDepositOpen(false)}
+          onSuccess={() => refetch()}
+        />
+      )}
+
+      {/* Create Proposal Modal */}
+      <CreateProposalModal
+        isOpen={isCreateProposalOpen}
+        groupId={selectedGroupId}
+        onClose={() => setIsCreateProposalOpen(false)}
+        onSuccess={() => refetch()}
+      />
+    </div>
   );
 }
-

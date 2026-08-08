@@ -1,5 +1,5 @@
 export const PROPOSAL_REGISTRY_ADDRESS = (process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
-  "0x4ECedc29B2A8E9f9f46221e76Cee7cEDe4eB613e") as `0x${string}`;
+  "0x7F45BF6De97E5D509D27a33ED6C6ea73D04026F3") as `0x${string}`;
 
 export const PROPOSAL_REGISTRY_ABI = [
   {
@@ -14,6 +14,29 @@ export const PROPOSAL_REGISTRY_ABI = [
       { name: "defaultVotingPeriod", type: "uint256" },
     ],
     outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "createGroupWithRules",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "name", type: "string" },
+      { name: "description", type: "string" },
+      { name: "isOpen", type: "bool" },
+      { name: "approvalThresholdBps", type: "uint256" },
+      { name: "defaultVotingPeriod", type: "uint256" },
+      { name: "maxDisbursementPerProposal", type: "uint256" },
+      { name: "highValueThreshold", type: "uint256" },
+      { name: "highValueApprovalBps", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "depositToTreasury",
+    stateMutability: "payable",
+    inputs: [{ name: "groupId", type: "uint256" }],
+    outputs: [],
   },
   {
     type: "function",
@@ -41,6 +64,34 @@ export const PROPOSAL_REGISTRY_ABI = [
       { name: "member", type: "address" },
     ],
     outputs: [],
+  },
+  {
+    type: "function",
+    name: "createFundingProposal",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "groupId", type: "uint256" },
+      { name: "title", type: "string" },
+      { name: "summary", type: "string" },
+      { name: "amount", type: "uint256" },
+      { name: "votingPeriodSeconds", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
+  },
+  {
+    type: "function",
+    name: "createRuleChangeProposal",
+    stateMutability: "nonpayable",
+    inputs: [
+      { name: "groupId", type: "uint256" },
+      { name: "title", type: "string" },
+      { name: "summary", type: "string" },
+      { name: "proposedMaxDisbursement", type: "uint256" },
+      { name: "proposedHighValueThreshold", type: "uint256" },
+      { name: "proposedHighValueApprovalBps", type: "uint256" },
+      { name: "votingPeriodSeconds", type: "uint256" },
+    ],
+    outputs: [{ name: "", type: "uint256" }],
   },
   {
     type: "function",
@@ -88,6 +139,10 @@ export const PROPOSAL_REGISTRY_ABI = [
           { name: "approvalThresholdBps", type: "uint256" },
           { name: "defaultVotingPeriod", type: "uint256" },
           { name: "memberCount", type: "uint256" },
+          { name: "treasuryBalance", type: "uint256" },
+          { name: "maxDisbursementPerProposal", type: "uint256" },
+          { name: "highValueThreshold", type: "uint256" },
+          { name: "highValueApprovalBps", type: "uint256" },
         ],
       },
     ],
@@ -119,6 +174,7 @@ export const PROPOSAL_REGISTRY_ABI = [
         type: "tuple",
         components: [
           { name: "groupId", type: "uint256" },
+          { name: "proposalType", type: "uint8" },
           { name: "title", type: "string" },
           { name: "summary", type: "string" },
           { name: "amount", type: "uint256" },
@@ -128,6 +184,10 @@ export const PROPOSAL_REGISTRY_ABI = [
           { name: "createdAt", type: "uint256" },
           { name: "deadline", type: "uint256" },
           { name: "finalized", type: "bool" },
+          { name: "executed", type: "bool" },
+          { name: "proposedMaxDisbursement", type: "uint256" },
+          { name: "proposedHighValueThreshold", type: "uint256" },
+          { name: "proposedHighValueApprovalBps", type: "uint256" },
         ],
       },
     ],
@@ -157,6 +217,35 @@ export const PROPOSAL_REGISTRY_ABI = [
       { name: "name", type: "string", indexed: false },
       { name: "admin", type: "address", indexed: true },
       { name: "isOpen", type: "bool", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "TreasuryDeposit",
+    inputs: [
+      { name: "groupId", type: "uint256", indexed: true },
+      { name: "sender", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "TreasuryDisbursed",
+    inputs: [
+      { name: "proposalId", type: "uint256", indexed: true },
+      { name: "groupId", type: "uint256", indexed: true },
+      { name: "recipient", type: "address", indexed: true },
+      { name: "amount", type: "uint256", indexed: false },
+    ],
+  },
+  {
+    type: "event",
+    name: "GroupRulesUpdated",
+    inputs: [
+      { name: "groupId", type: "uint256", indexed: true },
+      { name: "newMaxDisbursement", type: "uint256", indexed: false },
+      { name: "newHighValueThreshold", type: "uint256", indexed: false },
+      { name: "newHighValueApprovalBps", type: "uint256", indexed: false },
     ],
   },
   {
@@ -193,6 +282,7 @@ export const PROPOSAL_REGISTRY_ABI = [
       { name: "groupId", type: "uint256", indexed: true },
       { name: "proposer", type: "address", indexed: true },
       { name: "deadline", type: "uint256", indexed: false },
+      { name: "proposalType", type: "uint8", indexed: false },
     ],
   },
   {
@@ -210,6 +300,7 @@ export const PROPOSAL_REGISTRY_ABI = [
     inputs: [
       { name: "id", type: "uint256", indexed: true },
       { name: "passed", type: "bool", indexed: false },
+      { name: "executed", type: "bool", indexed: false },
     ],
   },
   {
@@ -284,5 +375,28 @@ export const PROPOSAL_REGISTRY_ABI = [
     name: "AlreadyFinalized",
     inputs: [{ name: "proposalId", type: "uint256" }],
   },
+  {
+    type: "error",
+    name: "ExceedsMaxDisbursement",
+    inputs: [
+      { name: "amount", type: "uint256" },
+      { name: "maxDisbursement", type: "uint256" },
+    ],
+  },
+  {
+    type: "error",
+    name: "InsufficientTreasuryFunds",
+    inputs: [
+      { name: "required", type: "uint256" },
+      { name: "available", type: "uint256" },
+    ],
+  },
+  {
+    type: "error",
+    name: "TransferFailed",
+    inputs: [
+      { name: "recipient", type: "address" },
+      { name: "amount", type: "uint256" },
+    ],
+  },
 ] as const;
-

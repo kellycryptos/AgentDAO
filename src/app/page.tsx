@@ -222,8 +222,8 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--bg-page)] text-[var(--text-primary)] flex flex-col font-sans selection:bg-[#7B4FF2] selection:text-white transition-colors duration-200">
       {/* HEADER */}
-      <header className="border-b border-[var(--border-color)] bg-[var(--bg-header)] backdrop-blur-md sticky top-0 z-20 px-4 sm:px-6 py-4 transition-colors">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
+      <header className="border-b border-[var(--border-color)] bg-[var(--bg-header)] backdrop-blur-md sticky top-0 z-20 px-4 sm:px-6 py-3 sm:py-4 transition-colors">
+        <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <img src="/logo.svg" alt="AgentDAO Logo" className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl shadow-md shrink-0" />
             <div>
@@ -239,7 +239,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5 sm:gap-3">
+          <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 sm:gap-3">
             <div className="flex items-center bg-[var(--bg-card)] p-1 rounded-xl border border-[var(--border-color)] text-xs font-receipt-mono shadow-sm">
               <button
                 onClick={() => setActiveMode("proposal")}
