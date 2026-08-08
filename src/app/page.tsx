@@ -26,6 +26,7 @@ import { ProposalList } from "@/components/ProposalList";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Footer } from "@/components/Footer";
 import { RatificationStrip } from "@/components/RatificationStrip";
+import { PROPOSAL_REGISTRY_ADDRESS } from "@/lib/abi";
 
 interface ProposalData {
   title: string;
@@ -305,7 +306,7 @@ export default function Home() {
                 </button>
 
                 <a
-                  href={`https://sepolia-explorer.giwa.io/address/0xcCe989122524D99D05C9EE871505c11bE935deCb`}
+                  href={`https://sepolia-explorer.giwa.io/address/${PROPOSAL_REGISTRY_ADDRESS}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center justify-center gap-1.5 text-[var(--text-primary)] hover:text-[var(--accent-violet)] font-semibold text-sm transition-colors py-2 group"
